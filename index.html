@@ -403,6 +403,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:21px;heigh
 .allerg-btn.on{border-color:var(--yellow);background:var(--yd);color:var(--yellow)}
 .pallerg-warn{font-size:10px;color:var(--red);margin-top:2px}
 
+/* ══ CUSTOM PRODUCT TAG ══════════════════════ */
+.tcustom{background:var(--od);color:var(--orange2)}
+
+/* ══ ADVANCED TOGGLE ═════════════════════════ */
+.adv-toggle{display:flex;align-items:center;gap:7px;padding:8px 0 4px;cursor:pointer;color:var(--mu);font-size:11px;user-select:none;border-top:1px solid var(--b1);margin-top:5px}
+.adv-toggle:hover{color:var(--text)}
+.adv-section{padding-top:9px}
+
 /* ══ GLUCIDES MANUEL ═════════════════════════ */
 .gluc-ctrl{display:flex;align-items:center;gap:6px;margin-bottom:9px;background:var(--c2);border-radius:8px;padding:7px 11px}
 .gluc-ctrl-lbl{flex:1;font-size:11px;color:var(--t2)}
@@ -447,7 +455,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:21px;heigh
 <!-- APP -->
 <div class="app" id="app" style="display:none">
   <div class="header">
-    <div class="logo">FUEL<span>FORCE</span><span class="lver">4.1</span></div>
+    <div class="logo">FUEL<span>FORCE</span><span class="lver">4.2</span></div>
     <div class="hright">
       <button class="hbtn no-print" onclick="showPlans()">📋 Plans</button>
       <div class="pills" id="pills"></div>
@@ -670,18 +678,19 @@ const SAISON_OBJECTIFS=[
 ];
 
 let S={
-  step:1,nSteps:5,splashDone:false,
+  step:1,nSteps:3,splashDone:false,
   expressMode:false,
+  showAdvanced:false,
   express:{sport:'velo',duree:120,niveau:'intermediaire'},
   profil:{poids:72,age:30,sexe:'H',sport:'velo',tolerance:'normale',niveau:'intermediaire',saisonObj:'loisir',allergenes:[]},
   sortie:{duree:120,intensite:3,temp:18,humidite:60,objectif:'performance',distanceKm:0,denivPos:0,glucOverride:null},
   slots:{boisson1:null,boisson2:null,gel1:null,gel2:null,gelb1:null,gelb2:null,solide1:null,solide2:null,recup1:null},
   budget:'mid',
   modal:null,mSearch:'',mCat:'all',
-  resTab:'resume',
+  resTab:'plan',
   weatherLoading:false,
-  firstLoad3:true,
   savedPlans:[],
+  customProds:[],
   installDismissed:false,
 };
 
@@ -690,6 +699,7 @@ function save(){
     const d={
       profil:S.profil,sortie:S.sortie,budget:S.budget,splashDone:true,
       savedPlans:S.savedPlans,
+      customProds:S.customProds,
       slots:Object.fromEntries(Object.entries(S.slots).map(([k,v])=>[k,v?v.id:null])),
     };
     localStorage.setItem('ff4',JSON.stringify(d));
@@ -705,9 +715,10 @@ function load(){
     if(d.budget)S.budget=d.budget;
     if(d.splashDone)S.splashDone=true;
     if(d.savedPlans)S.savedPlans=d.savedPlans;
+    if(d.customProds)S.customProds=d.customProds;
     if(d.slots){
-      Object.entries(d.slots).forEach(([k,id])=>{S.slots[k]=id?P.find(p=>p.id===id)||null:null;});
-      if(Object.values(S.slots).some(Boolean))S.firstLoad3=false;
+      const allProds=[...P,...S.customProds];
+      Object.entries(d.slots).forEach(([k,id])=>{S.slots[k]=id?allProds.find(p=>p.id===id)||null:null;});
     }
   }catch(e){}
 }
@@ -910,12 +921,12 @@ function renderStep(){
   renderModal();
 }
 function getContent(n){
-  if(n===1)return s1();if(n===2)return s2();if(n===3)return s3();if(n===4)return s4();if(n===5)return s5();return'';
+  if(n===1)return s1();if(n===2)return s2();if(n===3)return s3();return'';
 }
 
 /* ─── STEP 1 : PROFIL ─── */
 function s1(){
-  const{poids,age,sexe,sport,tolerance,niveau}=S.profil;
+  const{poids,age,sexe,sport,tolerance,niveau,allergenes,saisonObj}=S.profil;
   return`
   <div class="stitle">PROFIL</div>
   <div class="ssub">Données sauvegardées automatiquement</div>
@@ -924,18 +935,8 @@ function s1(){
       <div class="f"><label class="lbl">Poids (kg)</label>
         <input type="number" value="${poids}" min="30" max="200" onchange="upP('poids',+this.value);vP()">
         <div class="ferr" id="fw_p">Entre 30 et 200 kg</div></div>
-      <div class="f"><label class="lbl">Âge</label>
-        <input type="number" value="${age}" min="10" max="90" onchange="upP('age',+this.value);vP()">
-        <div class="ferr" id="fw_a">Entre 10 et 90 ans</div></div>
     </div>
-    <div class="row">
-      <div class="f"><label class="lbl">Sexe biologique</label>
-        <select onchange="upP('sexe',this.value)">
-          <option value="H" ${sexe==='H'?'selected':''}>Homme</option>
-          <option value="F" ${sexe==='F'?'selected':''}>Femme</option>
-        </select></div>
-    </div>
-    <div class="f" style="margin-bottom:9px"><label class="lbl">Sport principal</label>
+    <div class="f" style="margin-bottom:9px"><label class="lbl">Sport</label>
       <div class="seg">${['velo','trail','course','triathlon'].map(s=>`<button class="${sport===s?'on':''}" onclick="upP('sport','${s}')">${SPORT_LABEL[s]}</button>`).join('')}</div>
     </div>
     <div class="f"><label class="lbl">Tolérance digestive</label>
@@ -947,8 +948,32 @@ function s1(){
     <div class="f" style="margin-top:9px"><label class="lbl">Allergènes à éviter</label>
       <div class="allerg-pick">
         ${[['gluten','🌾'],['lait','🥛'],['fruits à coque','🥜'],['soja','🫘']].map(([a,i])=>`
-          <button class="allerg-btn ${(S.profil.allergenes||[]).includes(a)?'on':''}" onclick="toggleAllerg('${a}')">${i} ${a}</button>`).join('')}
+          <button class="allerg-btn ${(allergenes||[]).includes(a)?'on':''}" onclick="toggleAllerg('${a}')">${i} ${a}</button>`).join('')}
       </div></div>
+    <div class="adv-toggle" onclick="toggleAdvanced()">
+      <span>${S.showAdvanced?'▾':'▸'}</span>
+      <span>Paramètres avancés (âge, sexe, objectif de saison)</span>
+    </div>
+    ${S.showAdvanced?`<div class="adv-section">
+      <div class="row">
+        <div class="f"><label class="lbl">Âge</label>
+          <input type="number" value="${age}" min="10" max="90" onchange="upP('age',+this.value)">
+        </div>
+        <div class="f"><label class="lbl">Sexe biologique</label>
+          <select onchange="upP('sexe',this.value)">
+            <option value="H" ${sexe==='H'?'selected':''}>Homme</option>
+            <option value="F" ${sexe==='F'?'selected':''}>Femme</option>
+          </select></div>
+      </div>
+      <label class="lbl" style="margin-bottom:5px;display:block">OBJECTIF DE LA SAISON</label>
+      <div class="season-btns">
+        ${SAISON_OBJECTIFS.map(o=>`
+          <div class="season-item ${saisonObj===o.key?'on':''}" onclick="upP('saisonObj','${o.key}')">
+            <div class="season-ico">${o.ico}</div>
+            <div><div style="font-weight:600">${o.label}</div><div style="font-size:10px;color:var(--mu)">${o.sub}</div></div>
+          </div>`).join('')}
+      </div>
+    </div>`:''}
   </div>
   <label class="lbl" style="padding:0 2px 5px;display:block">NIVEAU DE PRATIQUE</label>
   <div class="ngrid">
@@ -958,14 +983,11 @@ function s1(){
       </div>`).join('')}
   </div>
   <div class="tip"><div class="tipico">💡</div><div>${SPORT_TIP[sport]||''}</div></div>
-  <label class="lbl" style="padding:0 2px 5px;display:block;margin-top:4px">OBJECTIF DE LA SAISON</label>
-  <div class="season-btns">
-    ${SAISON_OBJECTIFS.map(o=>`
-      <div class="season-item ${S.profil.saisonObj===o.key?'on':''}" onclick="upP('saisonObj','${o.key}')">
-        <div class="season-ico">${o.ico}</div>
-        <div><div style="font-weight:600">${o.label}</div><div style="font-size:10px;color:var(--mu)">${o.sub}</div></div>
-      </div>`).join('')}
+  <label class="lbl" style="padding:0 2px 5px;display:block;margin-top:4px">BUDGET PRODUITS</label>
+  <div class="budgbtns">
+    ${['eco','mid','prem','nat'].map(b=>`<button class="bdbtn ${S.budget===b?'on':''}" onclick="S.budget='${b}';save();renderStep()">${b==='eco'?'💚 Budget':b==='mid'?'🔥 Équilibré':b==='prem'?'👑 Premium':'🌿 Naturel'}</button>`).join('')}
   </div>
+  <div class="tip"><div class="tipico">💡</div><div style="font-size:11px">Le stack de produits sera auto-appliqué au budget choisi quand tu arrives à l'étape résultats.</div></div>
   <div style="height:6px"></div>`;
 }
 
@@ -1040,163 +1062,15 @@ function s2(){
   <div style="height:6px"></div>`;
 }
 
-/* ─── STEP 3 : PRODUITS ─── */
+/* ─── STEP 3 : MON PLAN ─── */
 function s3(){
-  if(S.firstLoad3){
-    S.firstLoad3=false;
-    const stack=STACKS[S.budget]||STACKS.mid;
-    Object.entries(stack.slots).forEach(([k,id])=>{S.slots[k]=id?P.find(p=>p.id===id)||null:null;});
-  }
-  const c=calc();
-  const pct=c.gTotal>0?Math.min(100,Math.round(c.gReel/c.gTotal*100)):0;
-  const bCol=pct>=85&&pct<=115?'var(--green)':pct>115?'var(--yellow)':'var(--orange)';
-
-  // Alerte fructose
-  let frucHtml='';
-  if(c.gH>60){
-    const goodProd=P.filter(p=>p.ratio2to1&&(p.cat==='boisson'||p.cat==='gel')).slice(0,4);
-    frucHtml=`<div class="fruc">
-      <div class="fruc-t">⚠️ Ratio Fructose:Glucose requis à ${c.gH}g/h</div>
-      <div class="fruc-b">Au-delà de <strong>60g/h</strong>, l'intestin sature le transporteur SGLT1 (glucose). Il faut des produits utilisant GLUT5 (fructose) en ratio <strong>2:1 Maltodextrine:Fructose</strong> pour éviter nausées et crampes.<br><span style="color:var(--green);margin-top:3px;display:block">✓ Produits compatibles :</span></div>
-      <div class="fruc-p">${goodProd.map(p=>`<span class="fruc-tag">${p.name} · ${p.brand}</span>`).join('')}</div>
-    </div>`;
-  }
-
-  // Alerte BCAA > 3h
-  let bcaaHtml='';
-  if(c.bcaaNeeded){
-    bcaaHtml=`<div class="abox ap">🔬 Effort > 3h : à partir de la 3ème heure, les acides aminés (BCAA) deviennent une source d'énergie. Privilégie des produits contenant des BCAA : GU Roctane, SiS Beta Fuel, ou 5-10g de BCAA en poudre dans la boisson.</div>`;
-  }
-
-  function slot(k,p,idx){
-    if(!p)return`<button class="eslot" onclick="openModal('${k}')"><div class="eplus">+</div><div style="font-size:10px">Ajouter</div></button>`;
-    return`<div class="pslot filled" onclick="openModal('${k}')">
-      <div class="slbl">Slot ${idx}</div><div class="sname">${p.name}</div>
-      <div class="sbrand">${p.brand}</div><div class="sval">${p.gluc}g · ${p.prix}€</div>
-      <button class="sdel" onclick="event.stopPropagation();clearSlot('${k}')">×</button>
-    </div>`;
-  }
-  function sec(ico,lbl,cib,k1,k2){
-    return`<div class="psec">
-      <div class="pshead"><span>${ico}</span><span>${lbl}</span><span style="margin-left:auto;color:var(--orange);font-weight:700">${cib}g</span></div>
-      <div class="psgrid">${slot(k1,S.slots[k1],1)}${slot(k2,S.slots[k2],2)}</div>
-    </div>`;
-  }
-  function secRecup(ico,lbl,k){
-    const p=S.slots[k];
-    if(!p)return`<div class="psec">
-      <div class="pshead"><span>${ico}</span><span>${lbl}</span></div>
-      <div class="psgrid"><button class="eslot" onclick="openModal('${k}')"><div class="eplus">+</div><div style="font-size:10px">Ajouter</div></button><div></div></div>
-    </div>`;
-    return`<div class="psec">
-      <div class="pshead"><span>${ico}</span><span>${lbl}</span></div>
-      <div class="psgrid"><div class="pslot filled" onclick="openModal('${k}')">
-        <div class="slbl">Post-effort</div><div class="sname">${p.name}</div>
-        <div class="sbrand">${p.brand}</div><div class="sval">${p.gluc}g gluc · ${p.prix}€</div>
-        <button class="sdel" onclick="event.stopPropagation();clearSlot('${k}')">×</button>
-      </div><div></div></div>
-    </div>`;
-  }
-
-  const stack=STACKS[S.budget];
-  return`
-  <div class="stitle">PRODUITS</div>
-  <div class="ssub">Sélection auto ou manuelle · <span style="color:var(--mu)">Base mise à jour ${DB_DATE}</span></div>
-  ${frucHtml}${bcaaHtml}
-  <div class="reco">
-    <div class="reco-t">⚡ Stack recommandé</div>
-    <div class="reco-d">${stack.label} — ${stack.desc}</div>
-    <div class="budgbtns">
-      ${['eco','mid','prem','nat'].map(b=>`<button class="bdbtn ${S.budget===b?'on':''}" onclick="setBudget('${b}')">${b==='eco'?'💚 Budget':b==='mid'?'🔥 Équilibré':b==='prem'?'👑 Premium':'🌿 Naturel'}</button>`).join('')}
-    </div>
-    <button class="reco-apply" onclick="applyStack()">→ APPLIQUER CE STACK</button>
-  </div>
-  <div class="totbar">
-    <div class="ti"><div class="tn" style="color:var(--orange)">${c.gTotal}g</div><div class="tl">Cible</div></div>
-    <div class="ti"><div class="tn" style="color:${bCol}">${c.gReel}g</div><div class="tl">Apport</div></div>
-    <div class="ti"><div class="tn" style="color:var(--blue)">${c.cout}€</div><div class="tl">Coût</div></div>
-    <div class="ti"><div class="tn" style="color:var(--yellow)">${c.gH}g/h</div><div class="tl">Obj/h</div></div>
-  </div>
-  <div class="gluc-ctrl">
-    <span class="gluc-ctrl-lbl">${S.sortie.glucOverride!==null?'✏ Cible manuelle':'⚡ Cible calculée'}</span>
-    <button class="gluc-adj" onclick="adjGluc(-5)">−5</button>
-    <span class="gluc-val">${c.gH}g/h</span>
-    <button class="gluc-adj" onclick="adjGluc(+5)">+5</button>
-    ${S.sortie.glucOverride!==null?`<button class="gluc-reset" onclick="resetGluc()">Auto</button>`:''}
-  </div>
-  <div class="glucbar">
-    <div class="glucbar-h"><span>GLUCIDES APPORTÉS</span><span style="color:${bCol};font-weight:600">${pct}%</span></div>
-    <div class="glucbar-t">
-      <div class="glucbar-f" style="width:${pct}%;background:${bCol}"></div>
-      <div class="glucbar-line" style="left:88%"></div>
-    </div>
-    <div style="font-size:9px;color:var(--mu);margin-top:2px;display:flex;justify-content:space-between"><span>0%</span><span>↑ Cible 88–115%</span></div>
-  </div>
-  <div class="card">
-    ${sec('💧','Boisson',c.cible.boisson,'boisson1','boisson2')}
-    ${sec('⚡','Gel standard',c.cible.gel,'gel1','gel2')}
-    ${sec('☕','Gel caféine',Math.round(c.cible.gel*.25),'gelb1','gelb2')}
-    ${sec('🍫','Solide / Barre',c.cible.solide,'solide1','solide2')}
-    <div class="divider"></div>
-    ${secRecup('🔄','Récupération post-effort','recup1')}
-  </div>
-  <div class="tip"><div class="tipico">💡</div><div style="font-size:11px">Gel caféiné dans les <strong>30-45 dernières minutes</strong>. Inutile sur sortie &lt; 90min.</div></div>
-  <div style="height:6px"></div>`;
-}
-
-/* ─── STEP 4 : TIMELINE ─── */
-function s4(){
-  const c=calc();
-  const hasP=Object.values(S.slots).some(Boolean);
-  return`
-  <div class="stitle">TIMELINE</div>
-  <div class="ssub">Plan de ravitaillement · timing de digestion inclus</div>
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:11px">
-    <div class="sc2"><div class="sn2" style="color:var(--orange)">${c.gH}g/h</div><div class="sl2">Gluc/h</div></div>
-    <div class="sc2"><div class="sn2" style="color:var(--blue)">${Math.round(S.sortie.duree/60*500)}ml</div><div class="sl2">Hydrat.</div></div>
-    <div class="sc2"><div class="sn2" style="color:var(--green)">${c.cout}€</div><div class="sl2">Coût</div></div>
-  </div>
-  <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:10px;color:var(--mu);margin-bottom:11px">
-    ${[['eat','var(--orange)','Solide (lent)'],['drink','var(--blue)','Boisson'],['gel','var(--green)','Gel (rapide)'],['caf','var(--purple)','Caféine']].map(([t,c,l])=>`<span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${c};margin-right:4px;vertical-align:middle"></span>${l}</span>`).join('')}
-  </div>
-  ${!hasP?`<div class="abox ai">ℹ️ Aucun produit sélectionné — timeline générique. Retourne à l'étape 3.</div>`:''}
-  <div class="timeline">
-    <div class="tl-ev">
-      <div class="tl-time key">J-3h</div>
-      <div class="tl-dot info"></div>
-      <div class="tl-card">
-        <div class="tl-what" style="color:var(--mu)">Repas pré-sortie</div>
-        <div class="tl-detail">Glucides complexes + 500ml eau · Riz, pâtes, pain, banane</div>
-        <div class="tl-digest">Digestion 2-3h · Évite les fibres, graisses, alcool</div>
-      </div>
-    </div>
-    ${buildTimeline()}
-  </div>
-  <div class="slabel">RÉCUPÉRATION POST-EFFORT</div>
-  <div class="recov-grid">
-    <div class="recov-item"><div class="recov-n" style="color:var(--blue)">${c.recov.eau}L</div><div class="recov-l">Eau</div><div class="recov-s">Priorité absolue</div></div>
-    <div class="recov-item"><div class="recov-n" style="color:var(--orange)">${c.recov.gluc}g</div><div class="recov-l">Glucides</div><div class="recov-s">Dans les 30min</div></div>
-    <div class="recov-item"><div class="recov-n" style="color:var(--green)">${c.recov.prot}g</div><div class="recov-l">Protéines</div><div class="recov-s">Réparation musc.</div></div>
-  </div>
-  ${S.slots.recup1?`<div class="card" style="margin-bottom:9px">
-    <div style="display:flex;align-items:center;gap:10px">
-      <div style="font-size:22px">🔄</div>
-      <div><div style="font-weight:600;font-size:13px">${S.slots.recup1.name}</div>
-      <div style="font-size:11px;color:var(--mu)">${S.slots.recup1.brand} · ${S.slots.recup1.gluc}g gluc · ${S.slots.recup1.prix}€</div>
-      ${S.slots.recup1.note?`<div style="font-size:10px;color:var(--t2);margin-top:2px">${S.slots.recup1.note}</div>`:''}
-      </div>
-    </div>
-  </div>`:''}
-  <div style="height:6px"></div>`;
-}
-
-/* ─── STEP 5 : RÉSULTATS ─── */
-function s5(){
   const c=calc();
   const{zone,calories,hydrat,sodium,gH,gTotal,cible,br,sr,gr,gReel,sodTotal,cout,recov,bcaaNeeded,progTips}=c;
   const{intensite,temp}=S.sortie;
   const{tolerance,sport,niveau}=S.profil;
   const nv=NIVEAUX[niveau];
+  const hasG=Object.values(S.slots).some(Boolean);
+  const bidons=Math.max(1,Math.ceil(hydrat/500));
 
   function cr(ico,nm,cib,reel,sod,prix){
     if(reel===0&&cib===0)return'';
@@ -1231,10 +1105,7 @@ function s5(){
     </div>`;
   }
 
-  const hasG=Object.values(S.slots).some(Boolean);
-  const bidons=Math.max(1,Math.ceil(hydrat/500));
-
-  const resumePanel=`
+  const planPanel=`
     ${buildScoreRing(c)}
     <div class="hero">
       <div class="heronum">${gTotal}g</div>
@@ -1246,6 +1117,13 @@ function s5(){
         <div><div class="hstat-n" style="color:var(--green)">${cout}€</div><div class="hstat-l">coût</div></div>
       </div>
     </div>
+    <div class="gluc-ctrl">
+      <span class="gluc-ctrl-lbl">${S.sortie.glucOverride!==null?'✏ Cible manuelle':'⚡ Cible calculée'}</span>
+      <button class="gluc-adj" onclick="adjGluc(-5)">−5</button>
+      <span class="gluc-val">${gH}g/h</span>
+      <button class="gluc-adj" onclick="adjGluc(+5)">+5</button>
+      ${S.sortie.glucOverride!==null?`<button class="gluc-reset" onclick="resetGluc()">Auto</button>`:''}
+    </div>
     <div class="slabel">BILAN GLUCIDIQUE</div>
     ${cr('💧','Boisson',cible.boisson,br.gluc,br.sod,br.prix)}
     ${cr('⚡','Gels',cible.gel,gr.glucA+gr.glucB,gr.sodA+gr.sodB,gr.prixA+gr.prixB)}
@@ -1256,7 +1134,8 @@ function s5(){
       <div class="nbar"><span class="nbar-lbl">Sodium</span><div class="nbar-track"><div class="nbar-fill" style="width:${Math.min(100,Math.round(sodTotal/sodium*100))||0}%;background:var(--teal)"></div></div><span style="font-size:10px;color:var(--mu);min-width:30px;text-align:right">${Math.min(100,Math.round(sodTotal/sodium*100))||0}%</span></div>
       <div class="nbar"><span class="nbar-lbl">Récupération</span><div class="nbar-track"><div class="nbar-fill" style="width:${S.slots.recup1?100:0}%;background:var(--purple)"></div></div><span style="font-size:10px;color:var(--mu);min-width:30px;text-align:right">${S.slots.recup1?'✓':'–'}</span></div>
     </div>`;
-  const materielPanel=`
+
+  const emporterPanel=`
     <div class="slabel">À EMPORTER</div>
     <div class="card">
       <div class="gear"><div><div style="font-weight:600">💧 Eau / Bidons</div><div class="ginfo">${hydrat}ml total estimé</div></div><div class="gqty">${bidons}<small> bidon${bidons>1?'s':''}</small></div></div>
@@ -1264,14 +1143,51 @@ function s5(){
       ${gi('gel1',gr.qA1,'gel')}${gi('gel2',gr.qA2,'gel')}
       ${gi('gelb1',gr.qB1,'gel')}${gi('gelb2',gr.qB2,'gel')}
       ${gi('solide1',sr.q1,'unité')}${gi('solide2',sr.q2,'unité')}
-      ${!hasG?'<div class="empty"><div class="eico">📋</div>Aucun produit sélectionné</div>':''}
+      ${!hasG?`<div class="empty"><div class="eico">📋</div>Aucun produit — <button style="background:none;border:none;color:var(--orange);cursor:pointer;font-size:12px;padding:0" onclick="showCustomizePanel()">Personnaliser</button></div>`:''}
     </div>
     <div class="slabel">RÉCUPÉRATION</div>
     <div class="card">
       <div class="gear"><div><div style="font-weight:600">🥛 Fenêtre anabolique</div><div class="ginfo">Dans les 30min après l'arrivée — priorité absolue</div></div><div style="font-size:11px;color:var(--t2);text-align:right">${recov.prot}g protéines<br>${recov.gluc}g glucides</div></div>
       <div class="gear"><div><div style="font-weight:600">💧 Réhydratation</div><div class="ginfo">1.5× le poids perdu en eau</div></div><div style="font-size:11px;color:var(--t2);text-align:right">${recov.eau}L eau<br>${recov.sod}mg sel</div></div>
-      ${S.slots.recup1?`<div class="gear" style="border:none"><div><div style="font-weight:600">${S.slots.recup1.name}</div><div class="ginfo">${S.slots.recup1.brand} · ${S.slots.recup1.gluc}g gluc</div></div><div class="gqty">1<small> dose</small></div></div>`:'<div class="gear" style="border:none;padding:9px 0 0"><div style="color:var(--mu);font-size:12px">Ajoute un produit de récupération à l\'étape 3 → slot Récupération</div></div>'}
+      ${S.slots.recup1?`<div class="gear" style="border:none"><div><div style="font-weight:600">${S.slots.recup1.name}</div><div class="ginfo">${S.slots.recup1.brand} · ${S.slots.recup1.gluc}g gluc</div></div><div class="gqty">1<small> dose</small></div></div>`:`<div class="gear" style="border:none;padding:9px 0 0"><div style="color:var(--mu);font-size:12px">Ajoute un produit de récupération via <button style="background:none;border:none;color:var(--orange);cursor:pointer;font-size:12px;padding:0" onclick="showCustomizePanel()">Personnaliser</button></div></div>`}
     </div>`;
+
+  const timelinePanel=`
+    <div class="sg2">
+      <div class="sc2"><div class="sn2" style="color:var(--orange)">${gH}g/h</div><div class="sl2">Gluc/h</div></div>
+      <div class="sc2"><div class="sn2" style="color:var(--blue)">${Math.round(S.sortie.duree/60*500)}ml</div><div class="sl2">Hydrat.</div></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:10px;color:var(--mu);margin-bottom:11px">
+      ${[['eat','var(--orange)','Solide'],['drink','var(--blue)','Boisson'],['gel','var(--green)','Gel'],['caf','var(--purple)','Caféine']].map(([t,cl,l])=>`<span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${cl};margin-right:4px;vertical-align:middle"></span>${l}</span>`).join('')}
+    </div>
+    ${!hasG?`<div class="abox ai">ℹ️ Aucun produit sélectionné — timeline générique.</div>`:''}
+    <div class="timeline">
+      <div class="tl-ev">
+        <div class="tl-time key">J-3h</div>
+        <div class="tl-dot info"></div>
+        <div class="tl-card">
+          <div class="tl-what" style="color:var(--mu)">Repas pré-sortie</div>
+          <div class="tl-detail">Glucides complexes + 500ml eau · Riz, pâtes, pain, banane</div>
+          <div class="tl-digest">Digestion 2-3h · Évite les fibres, graisses, alcool</div>
+        </div>
+      </div>
+      ${buildTimeline()}
+    </div>
+    <div class="slabel">RÉCUPÉRATION POST-EFFORT</div>
+    <div class="recov-grid">
+      <div class="recov-item"><div class="recov-n" style="color:var(--blue)">${recov.eau}L</div><div class="recov-l">Eau</div><div class="recov-s">Priorité absolue</div></div>
+      <div class="recov-item"><div class="recov-n" style="color:var(--orange)">${recov.gluc}g</div><div class="recov-l">Glucides</div><div class="recov-s">Dans les 30min</div></div>
+      <div class="recov-item"><div class="recov-n" style="color:var(--green)">${recov.prot}g</div><div class="recov-l">Protéines</div><div class="recov-s">Réparation musc.</div></div>
+    </div>
+    ${S.slots.recup1?`<div class="card" style="margin-bottom:9px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="font-size:22px">🔄</div>
+        <div><div style="font-weight:600;font-size:13px">${S.slots.recup1.name}</div>
+        <div style="font-size:11px;color:var(--mu)">${S.slots.recup1.brand} · ${S.slots.recup1.gluc}g gluc · ${S.slots.recup1.prix}€</div>
+        ${S.slots.recup1.note?`<div style="font-size:10px;color:var(--t2);margin-top:2px">${S.slots.recup1.note}</div>`:''}
+        </div>
+      </div>
+    </div>`:''}`;
 
   const progressionPanel=`
     <div class="slabel">PLAN PROGRESSIF</div>
@@ -1298,17 +1214,20 @@ function s5(){
     </div>`;
 
   return`
-  <div class="stitle">TON PLAN</div>
+  <div class="stitle">MON PLAN</div>
   <div class="ssub">${S.sortie.duree}min · ${zone.name} · ${S.sortie.temp}°C · ${nv.label}</div>
+  <button class="btn bsec" onclick="showCustomizePanel()" style="margin-bottom:11px;font-size:12px;padding:9px;letter-spacing:0">🎒 Personnaliser ma sélection de produits</button>
   <div class="restabs">
-    <button class="restab ${S.resTab==='resume'?'on':''}" onclick="setTab('resume')">📊 Résumé</button>
-    <button class="restab ${S.resTab==='materiel'?'on':''}" onclick="setTab('materiel')">🎒 Matériel</button>
-    <button class="restab ${S.resTab==='progression'?'on':''}" onclick="setTab('progression')">📈 Progression</button>
+    <button class="restab ${S.resTab==='plan'?'on':''}" onclick="setTab('plan')">📋 Plan</button>
+    <button class="restab ${S.resTab==='emporter'?'on':''}" onclick="setTab('emporter')">🎒 Emporter</button>
+    <button class="restab ${S.resTab==='timeline'?'on':''}" onclick="setTab('timeline')">⏱ Timeline</button>
+    <button class="restab ${S.resTab==='progression'?'on':''}" onclick="setTab('progression')">📈 Prog.</button>
   </div>
-  <div class="respanel ${S.resTab==='resume'?'active':''}">${resumePanel}</div>
-  <div class="respanel ${S.resTab==='materiel'?'active':''}">${materielPanel}</div>
+  <div class="respanel ${S.resTab==='plan'?'active':''}">${planPanel}</div>
+  <div class="respanel ${S.resTab==='emporter'?'active':''}">${emporterPanel}</div>
+  <div class="respanel ${S.resTab==='timeline'?'active':''}">${timelinePanel}</div>
   <div class="respanel ${S.resTab==='progression'?'active':''}">${progressionPanel}</div>
-  <div class="footnote">FuelForce 4.1 · Calories basées sur Ainsworth METs 2011 · Glucides selon Jeukendrup 2010<br>Base produits mise à jour ${DB_DATE} · Données indicatives · Consulte un nutritionniste du sport pour un protocole compétition</div>`;
+  <div class="footnote">FuelForce 4.2 · Calories basées sur Ainsworth METs 2011 · Glucides selon Jeukendrup 2010<br>Base produits mise à jour ${DB_DATE} · Données indicatives · Consulte un nutritionniste du sport pour un protocole compétition</div>`;
 }
 
 /* ════════════════════════════════════
@@ -1323,12 +1242,14 @@ function renderModal(){
   const q=S.mSearch.toLowerCase();
   const userAllerg=S.profil.allergenes||[];
   const hasConflict=p=>userAllerg.length>0&&p.allergenes&&p.allergenes.some(a=>userAllerg.includes(a));
-  const prods=P.filter(p=>(!fCat||p.cat===fCat)&&(!q||p.name.toLowerCase().includes(q)||p.brand.toLowerCase().includes(q)||p.note.toLowerCase().includes(q)))
+  const allProds=[...P,...S.customProds];
+  const prods=allProds.filter(p=>(!fCat||p.cat===fCat)&&(!q||p.name.toLowerCase().includes(q)||p.brand.toLowerCase().includes(q)||(p.note||'').toLowerCase().includes(q)))
     .sort((a,b)=>{const ac=hasConflict(a),bc=hasConflict(b);return ac===bc?0:ac?1:-1;});
   const labels={boisson1:'💧 Boisson 1',boisson2:'💧 Boisson 2',gel1:'⚡ Gel 1',gel2:'⚡ Gel 2',gelb1:'☕ Caféine 1',gelb2:'☕ Caféine 2',solide1:'🍫 Solide 1',solide2:'🍫 Solide 2',recup1:'🔄 Récupération'};
 
   function ptags(p){
     let t='';
+    if(p.custom)t+=`<span class="tag tcustom">Perso</span>`;
     if(p.tags.includes('nat'))t+=`<span class="tag tnat">Naturel</span>`;
     if(p.tags.includes('diy'))t+=`<span class="tag tdiy">DIY</span>`;
     if(p.tags.includes('caf'))t+=`<span class="tag tcaf">Caféine</span>`;
@@ -1345,10 +1266,11 @@ function renderModal(){
       <div class="pl">
         <div class="pname">${p.name}</div>
         <div class="pbrand">${p.brand}</div>
-        <div class="pnote">${p.note}</div>
+        <div class="pnote">${p.note||''}</div>
         ${p.allergenes&&p.allergenes.length?`<div class="${hasConflict(p)?'pallerg-warn':'pallerg'}">${hasConflict(p)?'🚫':'⚠'} ${p.allergenes.join(' · ')}</div>`:''}
         <div class="ptags">${ptags(p)}</div>
         ${URLS[p.id]?`<a class="buy-link" href="${URLS[p.id]}" target="_blank" rel="noopener" onclick="event.stopPropagation()">🛒 Acheter</a>`:''}
+        ${p.custom?`<button style="background:none;border:none;color:var(--mu);cursor:pointer;font-size:10px;padding:2px 0;margin-top:2px" onclick="event.stopPropagation();deleteCustomProd('${p.id}')">🗑 Supprimer</button>`:''}
       </div>
       <div class="pr">
         <div class="pgluc">${p.gluc}<small>g</small></div>
@@ -1373,6 +1295,7 @@ function renderModal(){
         </div>
         <div class="modal-scroll">
           ${list||'<div class="empty"><div class="eico">🔍</div>Aucun résultat</div>'}
+          <button class="save-plan-btn" onclick="showAddProductForm()" style="margin:8px 0">➕ Ajouter mon produit</button>
         </div>
       </div>
     </div>`);
@@ -1442,8 +1365,7 @@ function loadPlan(i){
   S.profil={...S.profil,...pl.profil};
   S.sortie={...S.sortie,...pl.sortie};
   S.budget=pl.budget;
-  if(pl.slots)Object.entries(pl.slots).forEach(([k,id])=>{S.slots[k]=id?P.find(p=>p.id===id)||null:null;});
-  S.firstLoad3=false;
+  if(pl.slots){const allProds=[...P,...S.customProds];Object.entries(pl.slots).forEach(([k,id])=>{S.slots[k]=id?allProds.find(p=>p.id===id)||null:null;});}
   closePlans();save();S.step=1;render();
   showToast('✓ Plan chargé');
 }
@@ -1460,7 +1382,7 @@ function buildPlanText(){
   const c=calc();
   const nv=NIVEAUX[S.profil.niveau];
   const zone=ZONES[S.sortie.intensite-1];
-  let txt=`🔥 FUELFORCE 4.1 — MON PLAN NUTRITION\n`;
+  let txt=`🔥 FUELFORCE 4.2 — MON PLAN NUTRITION\n`;
   txt+=`${'─'.repeat(36)}\n`;
   txt+=`📋 ${S.sortie.duree}min · ${zone.name} · ${S.sortie.temp}°C · ${SPORT_LABEL[S.profil.sport]} · ${nv.label}\n\n`;
   txt+=`🎯 GLUCIDES : ${c.gTotal}g (${c.gH}g/h)\n`;
@@ -1476,7 +1398,7 @@ function buildPlanText(){
   txt+=`  • Toutes les ${ZONES[S.sortie.intensite-1].l<=2?30:25}min : Gel ou boisson\n`;
   txt+=`  • -40min : Gel caféine si dispo\n`;
   txt+=`  • Arrivée : Récupération dans les 30min\n\n`;
-  txt+=`Créé avec FuelForce 4.0 — nutrition sport calibrée`;
+  txt+=`Créé avec FuelForce 4.2 — nutrition sport calibrée`;
   return txt;
 }
 
@@ -1493,7 +1415,7 @@ async function shareNative(){
 }
 
 function printPlan(){
-  S.step=5;S.resTab='materiel';render();
+  S.step=3;S.resTab='emporter';render();
   setTimeout(()=>{window.print();},300);
 }
 
@@ -1509,10 +1431,13 @@ function setMC(c){S.mCat=c;renderModal();}
 function setMS(v){S.mSearch=v;renderModal();}
 
 function selectProd(id){
-  const p=P.find(x=>x.id===id);
+  const allProds=[...P,...S.customProds];
+  const p=allProds.find(x=>x.id===id);
   if(p&&S.modal)S.slots[S.modal]=p;
-  const k=S.modal;S.modal=null;S.mSearch='';
+  S.modal=null;S.mSearch='';
   save();renderStep();renderModal();
+  const cp=document.getElementById('custPanelBg');
+  if(cp){cp.remove();showCustomizePanel();}
   setTimeout(()=>{const el=document.querySelector(`.pslot.filled`);if(el)el.classList.add('flash');},50);
 }
 
@@ -1531,19 +1456,19 @@ function applyStack(){
 }
 
 function vP(){
-  const{poids,age}=S.profil;
-  const pw=document.getElementById('fw_p'),aw=document.getElementById('fw_a');
+  const{poids}=S.profil;
+  const pw=document.getElementById('fw_p');
   if(pw)pw.classList.toggle('show',poids<30||poids>200);
-  if(aw)aw.classList.toggle('show',age<10||age>90);
-  return!(poids<30||poids>200||age<10||age>90);
+  return!(poids<30||poids>200);
 }
 
 function nextStep(){
   if(S.step===1&&!vP())return;
+  if(S.step===2&&!Object.values(S.slots).some(Boolean))doApplyStack();
   if(S.step<S.nSteps){S.step++;render();window.scrollTo(0,0);}
 }
 function prevStep(){if(S.step>1){S.step--;render();window.scrollTo(0,0);}}
-function restart(){S.step=1;S.slots={boisson1:null,boisson2:null,gel1:null,gel2:null,gelb1:null,gelb2:null,solide1:null,solide2:null,recup1:null};S.firstLoad3=true;render();window.scrollTo(0,0);}
+function restart(){S.step=1;S.slots={boisson1:null,boisson2:null,gel1:null,gel2:null,gelb1:null,gelb2:null,solide1:null,solide2:null,recup1:null};render();window.scrollTo(0,0);}
 
 async function fetchWeather(){
   if(S.weatherLoading)return;
@@ -1616,10 +1541,9 @@ function launchExpress(){
   const{sport,duree,niveau}=S.express;
   S.profil.sport=sport;S.profil.niveau=niveau;
   S.sortie.duree=duree;
-  // Intensité par défaut Z2 pour express
   S.sortie.intensite=2;
-  // Appliquer stack équilibré auto
-  S.firstLoad3=true;S.budget='mid';
+  S.budget='mid';
+  if(!Object.values(S.slots).some(Boolean))doApplyStack();
   const el=document.getElementById('expressOverlay');
   el.classList.add('out');
   setTimeout(()=>{
@@ -1761,6 +1685,226 @@ function showConfirmModal(msg,onConfirm){
 }
 function confirmModalAction(){closeConfirmModal();if(window._confirmModalCb)window._confirmModalCb();}
 function closeConfirmModal(){const e=document.getElementById('confirmModalBg');if(e)e.remove();window._confirmModalCb=null;}
+
+/* ════════════════════════════════════
+   ADVANCED TOGGLE
+════════════════════════════════════ */
+function toggleAdvanced(){S.showAdvanced=!S.showAdvanced;renderStep();}
+
+/* ════════════════════════════════════
+   PANNEAU PERSONNALISATION PRODUITS
+════════════════════════════════════ */
+function showCustomizePanel(){
+  const ex=document.getElementById('custPanelBg');if(ex)ex.remove();
+  const c=calc();
+  const pct=c.gTotal>0?Math.min(100,Math.round(c.gReel/c.gTotal*100)):0;
+  const bCol=pct>=85&&pct<=115?'var(--green)':pct>115?'var(--yellow)':'var(--orange)';
+
+  let frucHtml='';
+  if(c.gH>60){
+    const goodProd=P.filter(p=>p.ratio2to1&&(p.cat==='boisson'||p.cat==='gel')).slice(0,4);
+    frucHtml=`<div class="fruc" style="margin-bottom:9px">
+      <div class="fruc-t">⚠️ Ratio 2:1 requis à ${c.gH}g/h</div>
+      <div class="fruc-b">Au-delà de <strong>60g/h</strong>, utilise des produits ratio <strong>2:1 Maltodextrine:Fructose</strong>.</div>
+      <div class="fruc-p">${goodProd.map(p=>`<span class="fruc-tag">${p.name} · ${p.brand}</span>`).join('')}</div>
+    </div>`;
+  }
+  let bcaaHtml='';
+  if(c.bcaaNeeded)bcaaHtml=`<div class="abox ap" style="margin-bottom:9px">🔬 Effort > 3h : BCAA recommandés (GU Roctane, SiS Beta Fuel).</div>`;
+
+  function slot(k,p,idx){
+    if(!p)return`<button class="eslot" onclick="openModal('${k}')"><div class="eplus">+</div><div style="font-size:10px">Ajouter</div></button>`;
+    return`<div class="pslot filled" onclick="openModal('${k}')">
+      <div class="slbl">Slot ${idx}</div><div class="sname">${p.name}</div>
+      <div class="sbrand">${p.brand}</div><div class="sval">${p.gluc}g · ${p.prix}€</div>
+      <button class="sdel" onclick="event.stopPropagation();clearSlot('${k}');refreshCustPanel()">×</button>
+    </div>`;
+  }
+  function sec(ico,lbl,cib,k1,k2){
+    return`<div class="psec">
+      <div class="pshead"><span>${ico}</span><span>${lbl}</span><span style="margin-left:auto;color:var(--orange);font-weight:700">${cib}g</span></div>
+      <div class="psgrid">${slot(k1,S.slots[k1],1)}${slot(k2,S.slots[k2],2)}</div>
+    </div>`;
+  }
+  function secRecup(ico,lbl,k){
+    const p=S.slots[k];
+    if(!p)return`<div class="psec"><div class="pshead"><span>${ico}</span><span>${lbl}</span></div>
+      <div class="psgrid"><button class="eslot" onclick="openModal('${k}')"><div class="eplus">+</div><div style="font-size:10px">Ajouter</div></button><div></div></div></div>`;
+    return`<div class="psec"><div class="pshead"><span>${ico}</span><span>${lbl}</span></div>
+      <div class="psgrid"><div class="pslot filled" onclick="openModal('${k}')">
+        <div class="slbl">Post-effort</div><div class="sname">${p.name}</div>
+        <div class="sbrand">${p.brand}</div><div class="sval">${p.gluc}g gluc · ${p.prix}€</div>
+        <button class="sdel" onclick="event.stopPropagation();clearSlot('${k}');refreshCustPanel()">×</button>
+      </div><div></div></div></div>`;
+  }
+
+  const custList=S.customProds.length>0?`
+    <div class="slabel">MES PRODUITS PERSO</div>
+    <div class="card" style="padding:0 14px">
+      ${S.customProds.map(p=>`
+        <div class="pitem">
+          <div class="pl">
+            <div class="pname">${p.name} <span class="tag tcustom">Perso</span></div>
+            <div class="pbrand">${p.brand} · ${CATS.find(c=>c.key===p.cat)?.label||p.cat}</div>
+            ${p.note?`<div class="pnote">${p.note}</div>`:''}
+          </div>
+          <div class="pr"><div class="pgluc">${p.gluc}<small>g</small></div><div class="pprix">${p.prix}€</div></div>
+          <button style="background:none;border:none;color:var(--mu);cursor:pointer;font-size:18px;padding:0 6px;flex-shrink:0" onclick="deleteCustomProd('${p.id}')">×</button>
+        </div>`).join('')}
+    </div>`:'';
+
+  document.body.insertAdjacentHTML('beforeend',`
+    <div class="modal-bg" id="custPanelBg" onclick="if(event.target.id==='custPanelBg')closeCustomizePanel()">
+      <div class="modal" style="max-height:92vh" onclick="event.stopPropagation()">
+        <div class="modal-hdr">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div class="mtitle">🎒 PERSONNALISER</div>
+            <button onclick="closeCustomizePanel()" style="background:none;border:none;color:var(--mu);font-size:25px;cursor:pointer;padding:0 3px;line-height:1">×</button>
+          </div>
+          <div style="margin-top:9px">
+            <div class="budgbtns">
+              ${['eco','mid','prem','nat'].map(b=>`<button class="bdbtn ${S.budget===b?'on':''}" onclick="setBudgetCust('${b}')">${b==='eco'?'💚 Budget':b==='mid'?'🔥 Équilibré':b==='prem'?'👑 Premium':'🌿 Naturel'}</button>`).join('')}
+            </div>
+            <button class="reco-apply" onclick="applyStackCust()">→ APPLIQUER CE STACK</button>
+          </div>
+        </div>
+        <div class="modal-scroll">
+          <div style="padding-top:9px">
+            <div class="totbar">
+              <div class="ti"><div class="tn" style="color:var(--orange)">${c.gTotal}g</div><div class="tl">Cible</div></div>
+              <div class="ti"><div class="tn" style="color:${bCol}">${c.gReel}g</div><div class="tl">Apport</div></div>
+              <div class="ti"><div class="tn" style="color:var(--blue)">${c.cout}€</div><div class="tl">Coût</div></div>
+              <div class="ti"><div class="tn" style="color:var(--yellow)">${c.gH}g/h</div><div class="tl">Obj/h</div></div>
+            </div>
+            <div class="glucbar">
+              <div class="glucbar-h"><span>GLUCIDES APPORTÉS</span><span style="color:${bCol};font-weight:600">${pct}%</span></div>
+              <div class="glucbar-t">
+                <div class="glucbar-f" style="width:${pct}%;background:${bCol}"></div>
+                <div class="glucbar-line" style="left:88%"></div>
+              </div>
+            </div>
+            ${frucHtml}${bcaaHtml}
+            <div class="card">
+              ${sec('💧','Boisson',c.cible.boisson,'boisson1','boisson2')}
+              ${sec('⚡','Gel standard',c.cible.gel,'gel1','gel2')}
+              ${sec('☕','Gel caféine',Math.round(c.cible.gel*.25),'gelb1','gelb2')}
+              ${sec('🍫','Solide / Barre',c.cible.solide,'solide1','solide2')}
+              <div class="divider"></div>
+              ${secRecup('🔄','Récupération post-effort','recup1')}
+            </div>
+            <div class="tip"><div class="tipico">💡</div><div style="font-size:11px">Gel caféiné dans les <strong>30-45 dernières minutes</strong>. Inutile sur sortie &lt; 90min.</div></div>
+            ${custList}
+            <button class="save-plan-btn" onclick="showAddProductForm()">➕ Ajouter mon produit</button>
+          </div>
+        </div>
+      </div>
+    </div>`);
+}
+
+function closeCustomizePanel(){
+  const e=document.getElementById('custPanelBg');if(e)e.remove();
+  renderStep();
+}
+
+function refreshCustPanel(){
+  const cp=document.getElementById('custPanelBg');
+  if(cp){cp.remove();showCustomizePanel();}
+}
+
+function setBudgetCust(b){setBudget(b);refreshCustPanel();}
+
+function applyStackCust(){
+  if(Object.values(S.slots).some(Boolean)){
+    showConfirmModal('Appliquer ce stack remplace tes produits actuels. Continuer ?',()=>{doApplyStack();refreshCustPanel();});
+  }else{doApplyStack();refreshCustPanel();}
+}
+
+/* ════════════════════════════════════
+   AJOUT DE PRODUIT PERSONNALISÉ
+════════════════════════════════════ */
+function showAddProductForm(){
+  const ex=document.getElementById('addProdBg');if(ex)ex.remove();
+  document.body.insertAdjacentHTML('beforeend',`
+    <div class="modal-bg" id="addProdBg" onclick="if(event.target.id==='addProdBg')closeAddProductForm()">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-hdr">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div class="mtitle">➕ MON PRODUIT</div>
+            <button onclick="closeAddProductForm()" style="background:none;border:none;color:var(--mu);font-size:25px;cursor:pointer;padding:0 3px;line-height:1">×</button>
+          </div>
+        </div>
+        <div class="modal-scroll">
+          <div style="padding-top:9px;padding-bottom:30px">
+            <label class="lbl">Nom du produit *</label>
+            <input type="text" id="cpName" class="msearch" placeholder="ex: Gel maison miel+sel" style="margin:5px 0 9px">
+            <label class="lbl">Marque / fabricant</label>
+            <input type="text" id="cpBrand" class="msearch" placeholder="ex: DIY, Décathlon…" style="margin:5px 0 9px">
+            <label class="lbl">Catégorie</label>
+            <select id="cpCat" style="margin:5px 0 9px">
+              <option value="gel">⚡ Gel</option>
+              <option value="boisson">💧 Boisson</option>
+              <option value="gel_caf">☕ Gel Caféine</option>
+              <option value="gommes">🍬 Gommes</option>
+              <option value="solide">🍫 Solide / Barre</option>
+              <option value="naturel">🍌 Naturel</option>
+              <option value="recup">🔄 Récupération</option>
+            </select>
+            <div class="row">
+              <div class="f"><label class="lbl">Glucides / unité (g) *</label>
+                <input type="number" id="cpGluc" class="msearch" value="25" min="0" max="200" style="margin:5px 0 9px">
+              </div>
+              <div class="f"><label class="lbl">Sodium / unité (mg)</label>
+                <input type="number" id="cpSod" class="msearch" value="0" min="0" max="2000" style="margin:5px 0 9px">
+              </div>
+            </div>
+            <div class="row">
+              <div class="f"><label class="lbl">Prix / unité (€)</label>
+                <input type="number" id="cpPrix" class="msearch" value="1.5" min="0" max="50" step="0.1" style="margin:5px 0 9px">
+              </div>
+              <div class="f"><label class="lbl">Digestion (min)</label>
+                <input type="number" id="cpDigest" class="msearch" value="10" min="0" max="60" style="margin:5px 0 9px">
+              </div>
+            </div>
+            <label class="lbl">Note / description</label>
+            <input type="text" id="cpNote" class="msearch" placeholder="ex: Recette patate douce + sel de mer" style="margin:5px 0 14px">
+            <button class="btn bprim" onclick="confirmAddProduct()">AJOUTER À MA BASE</button>
+            <button class="btn bsec" style="margin-top:6px;margin-bottom:10px" onclick="closeAddProductForm()">Annuler</button>
+          </div>
+        </div>
+      </div>
+    </div>`);
+  setTimeout(()=>{const i=document.getElementById('cpName');if(i){i.focus();}},60);
+}
+
+function confirmAddProduct(){
+  const name=(document.getElementById('cpName')?.value||'').trim();
+  if(!name){showToast('⚠ Nom requis');return;}
+  const prod={
+    id:'custom_'+Date.now(),
+    name,
+    brand:(document.getElementById('cpBrand')?.value||'').trim()||'Perso',
+    cat:document.getElementById('cpCat')?.value||'gel',
+    gluc:+(document.getElementById('cpGluc')?.value||0),
+    sod:+(document.getElementById('cpSod')?.value||0),
+    prix:+(document.getElementById('cpPrix')?.value||0),
+    note:(document.getElementById('cpNote')?.value||'').trim(),
+    tags:[],budget:'mid',ratio2to1:false,
+    allergenes:[],digestMin:+(document.getElementById('cpDigest')?.value||10),
+    custom:true,
+  };
+  S.customProds.push(prod);
+  save();closeAddProductForm();refreshCustPanel();
+  showToast('✓ Produit ajouté !');
+}
+
+function closeAddProductForm(){const e=document.getElementById('addProdBg');if(e)e.remove();}
+
+function deleteCustomProd(id){
+  S.customProds=S.customProds.filter(p=>p.id!==id);
+  Object.keys(S.slots).forEach(k=>{if(S.slots[k]&&S.slots[k].id===id)S.slots[k]=null;});
+  save();closeModal();refreshCustPanel();
+  showToast('Produit supprimé');
+}
 
 /* ════════════════════════════════════
    INIT
