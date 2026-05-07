@@ -396,6 +396,21 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:21px;heigh
 .wbtn:hover{border-color:var(--orange);color:var(--orange)}
 .wbtn.loading{color:var(--mu);pointer-events:none}
 .divider{height:1px;background:var(--b1);margin:10px 0}
+
+/* ══ ALLERGÈNES ══════════════════════════════ */
+.allerg-pick{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px}
+.allerg-btn{padding:5px 12px;border-radius:18px;border:1.5px solid var(--b1);background:transparent;color:var(--mu);font-size:11px;cursor:pointer;font-family:var(--fs);transition:all .2s;font-weight:500}
+.allerg-btn.on{border-color:var(--yellow);background:var(--yd);color:var(--yellow)}
+.pallerg-warn{font-size:10px;color:var(--red);margin-top:2px}
+
+/* ══ GLUCIDES MANUEL ═════════════════════════ */
+.gluc-ctrl{display:flex;align-items:center;gap:6px;margin-bottom:9px;background:var(--c2);border-radius:8px;padding:7px 11px}
+.gluc-ctrl-lbl{flex:1;font-size:11px;color:var(--t2)}
+.gluc-adj{padding:4px 10px;border:1px solid var(--b1);border-radius:6px;background:transparent;color:var(--text);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--fs);transition:all .2s}
+.gluc-adj:hover{border-color:var(--orange);color:var(--orange)}
+.gluc-val{font-family:var(--ff);font-size:18px;color:var(--orange);min-width:52px;text-align:center}
+.gluc-reset{padding:4px 8px;border:1px solid var(--b1);border-radius:6px;background:transparent;color:var(--mu);font-size:10px;cursor:pointer;font-family:var(--fs);transition:all .2s}
+.gluc-reset:hover{border-color:var(--b2);color:var(--text)}
 </style>
 </head>
 <body>
@@ -541,6 +556,56 @@ const CATS=[
   {key:'recup',label:'🔄 Récupération'},
 ];
 
+/* ════════════════════════════════════
+   LIENS D'ACHAT — prix les plus bas France
+════════════════════════════════════ */
+const URLS={
+  /* boissons */
+  c30:        'https://www.alltricks.fr/F-11928-nutrition/P-2590782-boisson_energetique_neversecond_c30_sports_drink_mix_citron_640g',
+  tailwind:   'https://www.amazon.fr/Tailwind-Nutrition-Serving-Orange-Flavour/dp/B01866Z6DA',
+  maurten160: 'https://www.alltricks.fr/F-11928-nutrition/P-1202294-boisson_energetique_maurten_drink_mix_160___42g',
+  maurten320: 'https://www.alltricks.fr/F-11928-nutrition/P-1202292-boisson_energetique_maurten_drink_mix_320___83g',
+  sis_beta_drink:'https://www.alltricks.fr/sis-beta-fuel.sdex',
+  nduranz:    'https://www.amazon.fr/Nduranz-%C3%A9nerg%C3%A9tique-isotonique-%C3%A9lectrolytes-performance/dp/B0B34YDGC8',
+  pf90:       'https://www.alltricks.fr/F-11928-nutrition/P-2771181-gel_energetique_precision_fuel___hydration_90g_carb___153g',
+  nuun_sport: 'https://www.amazon.fr/Nuun-Actif-hydratation-boissons-Original/dp/B001QW1L72',
+  ph1500:     'https://www.alltricks.fr/F-11928-nutrition/P-3037405-boisson_electrolytes_precision_fuel___hydration_1500___8x20g',
+  apt_bois:   'https://www.decathlon.fr/nutrition-sante/boissons-energetiques',
+  apt_iso:    'https://www.decathlon.fr/browse/c0-nutrition-sportive/c1-boisson-energetique/c2-boisson-isotonique/_/N-aaqdvg',
+  skratch:    'https://www.amazon.fr/Skratch-Labs-dhydratation-sportive-portions/dp/B075NNV4FZ',
+  overstims_h:'https://www.alltricks.fr/F-11928-nutrition/P-78632-overstims_antiossidante_energy_drink_hydrixir_box_600g_bacche_gusto',
+  /* gels */
+  gel100:     'https://www.alltricks.fr/F-11928-nutrition/P-1202288-gel_energetique_maurten_gel_100___40g',
+  go_iso:     'https://probikeshop.fr/products/gel-energetique-sis-go-isotonic-energy-60ml',
+  pf30:       'https://www.alltricks.fr/F-11928-nutrition/P-3037403-gel_energetique_precision_fuel___hydration_30g_carb_gout_neutre___51g',
+  nrgy_gel:   'https://www.amazon.fr/Nduranz-%C3%A9nerg%C3%A9tique-isotonique-%C3%A9lectrolytes-performance/dp/B0B34YDGC8',
+  gu_orig:    'https://www.alltricks.fr/F-11928-nutrition/P-20421-gel_energetique_gu_energy_cafe_espresso_love___32g',
+  pb_gel:     'https://probikeshop.fr/products/gel-energetique-powerbar-powergel-original-41gr',
+  apt_gel:    'https://www.decathlon.fr/C-10910-aptonia',
+  clif_shot:  'https://www.alltricks.fr/F-11928-nutrition/P-78672-clif_bar_gel_energetique_clif_shot_chocolat',
+  /* gels caféine */
+  gel100caf:  'https://www.ekosport.fr/maurten-gel-100-caf-100-pack-12-p-9-156019',
+  go_caf:     'https://www.amazon.fr/isotonique-%C3%A9nerg%C3%A9tique-caf%C3%A9ine-glucides-sachets/dp/B001F3UALA',
+  overstims_caf:'https://www.alltricks.fr/F-11928-nutrition/P-175954-gel_energetique_overstims_coup_de_fouet_liquide_fruits_rouges',
+  pf30_caf:   'https://www.alltricks.fr/F-11928-nutrition/P-3037413-gel_energetique_precision_fuel___hydration_30g_carb___cafeine___51g',
+  clif_caf:   'https://www.alltricks.fr/C-136532-clif-bar',
+  apt_caf:    'https://www.decathlon.fr/C-10910-aptonia',
+  pb_caf:     'https://probikeshop.fr/products/gel-energetique-powerbar-powergel-fruit-41g-mange-passion-cafeine',
+  /* gommes */
+  pb_shots:   'https://www.amazon.fr/PowerBar-PowerGel-Shots-Cola-24x60g/dp/B08HLNZCJ3',
+  clif_bloks: 'https://www.alltricks.fr/F-11928-nutrition/P-79039-clif_bar_gomme_energetique_clif_blocks_fraise',
+  /* solides */
+  clif_bar:   'https://www.alltricks.fr/C-136532-clif-bar',
+  veloforte:  'https://www.amazon.fr/Veloforte-Bosco-%C3%A9nerg%C3%A9tique-enti%C3%A8rement-naturelle/dp/B084RH7B4D',
+  apt_pate:   'https://www.decathlon.fr/C-10910-aptonia',
+  apt_barre:  'https://www.decathlon.fr/C-10910-aptonia',
+  baouw:      'https://www.alltricks.fr/F-11928-nutrition/P-2615043-barre_energetique_baouw_extra_chocolat_noisette___50g',
+  /* récupération */
+  apt_recup:  'https://www.decathlon.fr/p/boisson-de-recuperation-poudre-recovery-drink-citron-512g/_/R-p-188541',
+  sis_recup:  'https://www.alltricks.fr/F-11928-nutrition/P-2903745-boisson_de_recuperation_sis_rego_rapid_recovery_chocolat___1_5kg',
+  apt_bar_recup:'https://www.decathlon.fr/p/barre-proteinee-de-recuperation-sportive-5x40g/_/R-p-112771',
+};
+
 const ZONES=[
   {l:1,name:'Z1 Récup',gluc:20,hyd:260,sod:330,color:'#4DA6FF'},
   {l:2,name:'Z2 Endurance',gluc:45,hyd:420,sod:560,color:'#3DD68C'},
@@ -608,8 +673,8 @@ let S={
   step:1,nSteps:5,splashDone:false,
   expressMode:false,
   express:{sport:'velo',duree:120,niveau:'intermediaire'},
-  profil:{poids:72,age:30,sexe:'H',sport:'velo',tolerance:'normale',niveau:'intermediaire',saisonObj:'loisir'},
-  sortie:{duree:120,intensite:3,temp:18,humidite:60,objectif:'performance',distanceKm:0,denivPos:0},
+  profil:{poids:72,age:30,sexe:'H',sport:'velo',tolerance:'normale',niveau:'intermediaire',saisonObj:'loisir',allergenes:[]},
+  sortie:{duree:120,intensite:3,temp:18,humidite:60,objectif:'performance',distanceKm:0,denivPos:0,glucOverride:null},
   slots:{boisson1:null,boisson2:null,gel1:null,gel2:null,gelb1:null,gelb2:null,solide1:null,solide2:null,recup1:null},
   budget:'mid',
   modal:null,mSearch:'',mCat:'all',
@@ -690,6 +755,7 @@ function calc(){
   if(h<0.75)gH=Math.min(gH,25);
   if(h>3.5)gH=Math.min(gH+10,120);
   gH=Math.round(Math.min(gH,120));
+  if(S.sortie.glucOverride!==null)gH=Math.round(Math.min(Math.max(S.sortie.glucOverride,10),120));
   const gTotal=Math.round(gH*h);
 
   // Répartition
@@ -878,6 +944,11 @@ function s1(){
         <button class="${tolerance==='normale'?'on':''}" onclick="upP('tolerance','normale')">👍 Normale</button>
         <button class="${tolerance==='robuste'?'on':''}" onclick="upP('tolerance','robuste')">💪 Robuste</button>
       </div></div>
+    <div class="f" style="margin-top:9px"><label class="lbl">Allergènes à éviter</label>
+      <div class="allerg-pick">
+        ${[['gluten','🌾'],['lait','🥛'],['fruits à coque','🥜'],['soja','🫘']].map(([a,i])=>`
+          <button class="allerg-btn ${(S.profil.allergenes||[]).includes(a)?'on':''}" onclick="toggleAllerg('${a}')">${i} ${a}</button>`).join('')}
+      </div></div>
   </div>
   <label class="lbl" style="padding:0 2px 5px;display:block">NIVEAU DE PRATIQUE</label>
   <div class="ngrid">
@@ -1045,6 +1116,13 @@ function s3(){
     <div class="ti"><div class="tn" style="color:${bCol}">${c.gReel}g</div><div class="tl">Apport</div></div>
     <div class="ti"><div class="tn" style="color:var(--blue)">${c.cout}€</div><div class="tl">Coût</div></div>
     <div class="ti"><div class="tn" style="color:var(--yellow)">${c.gH}g/h</div><div class="tl">Obj/h</div></div>
+  </div>
+  <div class="gluc-ctrl">
+    <span class="gluc-ctrl-lbl">${S.sortie.glucOverride!==null?'✏ Cible manuelle':'⚡ Cible calculée'}</span>
+    <button class="gluc-adj" onclick="adjGluc(-5)">−5</button>
+    <span class="gluc-val">${c.gH}g/h</span>
+    <button class="gluc-adj" onclick="adjGluc(+5)">+5</button>
+    ${S.sortie.glucOverride!==null?`<button class="gluc-reset" onclick="resetGluc()">Auto</button>`:''}
   </div>
   <div class="glucbar">
     <div class="glucbar-h"><span>GLUCIDES APPORTÉS</span><span style="color:${bCol};font-weight:600">${pct}%</span></div>
@@ -1243,7 +1321,10 @@ function renderModal(){
   if(S.mCat==='all'&&cm[S.modal])S.mCat=cm[S.modal];
   const fCat=S.mCat==='all'?null:S.mCat;
   const q=S.mSearch.toLowerCase();
-  const prods=P.filter(p=>(!fCat||p.cat===fCat)&&(!q||p.name.toLowerCase().includes(q)||p.brand.toLowerCase().includes(q)||p.note.toLowerCase().includes(q)));
+  const userAllerg=S.profil.allergenes||[];
+  const hasConflict=p=>userAllerg.length>0&&p.allergenes&&p.allergenes.some(a=>userAllerg.includes(a));
+  const prods=P.filter(p=>(!fCat||p.cat===fCat)&&(!q||p.name.toLowerCase().includes(q)||p.brand.toLowerCase().includes(q)||p.note.toLowerCase().includes(q)))
+    .sort((a,b)=>{const ac=hasConflict(a),bc=hasConflict(b);return ac===bc?0:ac?1:-1;});
   const labels={boisson1:'💧 Boisson 1',boisson2:'💧 Boisson 2',gel1:'⚡ Gel 1',gel2:'⚡ Gel 2',gelb1:'☕ Caféine 1',gelb2:'☕ Caféine 2',solide1:'🍫 Solide 1',solide2:'🍫 Solide 2',recup1:'🔄 Récupération'};
 
   function ptags(p){
@@ -1265,9 +1346,9 @@ function renderModal(){
         <div class="pname">${p.name}</div>
         <div class="pbrand">${p.brand}</div>
         <div class="pnote">${p.note}</div>
-        ${p.allergenes&&p.allergenes.length?`<div class="pallerg">⚠ ${p.allergenes.join(' · ')}</div>`:''}
+        ${p.allergenes&&p.allergenes.length?`<div class="${hasConflict(p)?'pallerg-warn':'pallerg'}">${hasConflict(p)?'🚫':'⚠'} ${p.allergenes.join(' · ')}</div>`:''}
         <div class="ptags">${ptags(p)}</div>
-        ${p.url?`<a class="buy-link" href="${p.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">🛒 Voir le produit</a>`:''}
+        ${URLS[p.id]?`<a class="buy-link" href="${URLS[p.id]}" target="_blank" rel="noopener" onclick="event.stopPropagation()">🛒 Acheter</a>`:''}
       </div>
       <div class="pr">
         <div class="pgluc">${p.gluc}<small>g</small></div>
@@ -1338,22 +1419,22 @@ function showPlans(){
 function closePlans(){const e=document.getElementById('plansBg');if(e)e.remove();}
 
 function savePlan(){
-  const c=calc();
-  const name=prompt('Nom du plan (ex: Marathon Paris, Sortie Col du Galibier…)','Plan '+(S.savedPlans.length+1));
-  if(!name)return;
-  const now=new Date();
-  S.savedPlans.unshift({
-    name,
-    sport:S.profil.sport,duree:S.sortie.duree,niveau:S.profil.niveau,
-    glucH:c.gH,intensite:S.sortie.intensite,temp:S.sortie.temp,
-    budget:S.budget,cout:c.cout,
-    date:now.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'}),
-    profil:{...S.profil},sortie:{...S.sortie},
-    slots:Object.fromEntries(Object.entries(S.slots).map(([k,v])=>[k,v?v.id:null])),
+  showNameModal('Plan '+(S.savedPlans.length+1),name=>{
+    const c=calc();
+    const now=new Date();
+    S.savedPlans.unshift({
+      name,
+      sport:S.profil.sport,duree:S.sortie.duree,niveau:S.profil.niveau,
+      glucH:c.gH,intensite:S.sortie.intensite,temp:S.sortie.temp,
+      budget:S.budget,cout:c.cout,
+      date:now.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'}),
+      profil:{...S.profil},sortie:{...S.sortie},
+      slots:Object.fromEntries(Object.entries(S.slots).map(([k,v])=>[k,v?v.id:null])),
+    });
+    if(S.savedPlans.length>10)S.savedPlans=S.savedPlans.slice(0,10);
+    save();closePlans();
+    showToast('💾 Plan sauvegardé !');
   });
-  if(S.savedPlans.length>10)S.savedPlans=S.savedPlans.slice(0,10);
-  save();closePlans();
-  showToast('💾 Plan sauvegardé !');
 }
 
 function loadPlan(i){
@@ -1379,7 +1460,7 @@ function buildPlanText(){
   const c=calc();
   const nv=NIVEAUX[S.profil.niveau];
   const zone=ZONES[S.sortie.intensite-1];
-  let txt=`🔥 FUELFORCE 4.0 — MON PLAN NUTRITION\n`;
+  let txt=`🔥 FUELFORCE 4.1 — MON PLAN NUTRITION\n`;
   txt+=`${'─'.repeat(36)}\n`;
   txt+=`📋 ${S.sortie.duree}min · ${zone.name} · ${S.sortie.temp}°C · ${SPORT_LABEL[S.profil.sport]} · ${nv.label}\n\n`;
   txt+=`🎯 GLUCIDES : ${c.gTotal}g (${c.gH}g/h)\n`;
@@ -1437,13 +1518,17 @@ function selectProd(id){
 
 function clearSlot(k){S.slots[k]=null;save();renderStep();}
 
-function setBudget(b){
-  S.budget=b;
-  const stack=STACKS[b];
+function setBudget(b){S.budget=b;save();renderStep();}
+function doApplyStack(){
+  const stack=STACKS[S.budget];
   if(stack)Object.entries(stack.slots).forEach(([k,id])=>{S.slots[k]=id?P.find(p=>p.id===id)||null:null;});
   save();renderStep();
 }
-function applyStack(){setBudget(S.budget);}
+function applyStack(){
+  if(Object.values(S.slots).some(Boolean)){
+    showConfirmModal('Appliquer ce stack va remplacer tes produits actuels. Continuer ?',doApplyStack);
+  }else{doApplyStack();}
+}
 
 function vP(){
   const{poids,age}=S.profil;
@@ -1581,12 +1666,6 @@ function buildScoreRing(c){
 /* ══ OBJECTIF DE SAISON dans S1 ═══════════════ */
 // Injecté dans s1() via patch
 
-/* ══ LIENS D'ACHAT dans modal ════════════════ */
-function buyLink(p){
-  if(!p.url)return'';
-  return`<a class="buy-link" href="${p.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">🛒 Acheter</a>`;
-}
-
 /* ══ PWA INSTALL ══════════════════════════════ */
 let deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',e=>{
@@ -1616,6 +1695,72 @@ function checkInstall(){
   const blob=new Blob([JSON.stringify(manifest)],{type:'application/json'});
   document.getElementById('pwa-manifest').href=URL.createObjectURL(blob);
 })();
+
+/* ════════════════════════════════════
+   ALLERGÈNES
+════════════════════════════════════ */
+function toggleAllerg(a){
+  const arr=S.profil.allergenes||[];
+  const i=arr.indexOf(a);
+  if(i===-1)arr.push(a);else arr.splice(i,1);
+  S.profil.allergenes=arr;
+  save();renderStep();
+}
+
+/* ════════════════════════════════════
+   GLUCIDES MANUEL
+════════════════════════════════════ */
+function adjGluc(d){
+  const cur=S.sortie.glucOverride!==null?S.sortie.glucOverride:calc().gH;
+  S.sortie.glucOverride=Math.round(Math.min(Math.max(cur+d,10),120));
+  save();renderStep();
+}
+function resetGluc(){S.sortie.glucOverride=null;save();renderStep();}
+
+/* ════════════════════════════════════
+   MODALES IN-APP
+════════════════════════════════════ */
+function showNameModal(defaultVal,onSave){
+  const ex=document.getElementById('nameModalBg');if(ex)ex.remove();
+  document.body.insertAdjacentHTML('beforeend',`
+    <div class="modal-bg" id="nameModalBg" onclick="if(event.target.id==='nameModalBg')closeNameModal()">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-hdr">
+          <div class="mtitle">SAUVEGARDER LE PLAN</div>
+          <input type="text" id="planNameInput" class="msearch" placeholder="ex: Marathon Paris, Col du Galibier…"
+            value="${defaultVal}" style="margin-top:10px" onkeydown="if(event.key==='Enter')confirmNameModal()">
+          <button class="btn bprim" style="margin-top:8px" onclick="confirmNameModal()">SAUVEGARDER</button>
+          <button class="btn bsec" style="margin-top:6px;margin-bottom:20px" onclick="closeNameModal()">Annuler</button>
+        </div>
+      </div>
+    </div>`);
+  setTimeout(()=>{const i=document.getElementById('planNameInput');if(i){i.focus();i.select();}},60);
+  window._nameModalCb=onSave;
+}
+function confirmNameModal(){
+  const val=(document.getElementById('planNameInput')?.value||'').trim();
+  if(!val)return;
+  closeNameModal();
+  if(window._nameModalCb)window._nameModalCb(val);
+}
+function closeNameModal(){const e=document.getElementById('nameModalBg');if(e)e.remove();window._nameModalCb=null;}
+
+function showConfirmModal(msg,onConfirm){
+  const ex=document.getElementById('confirmModalBg');if(ex)ex.remove();
+  document.body.insertAdjacentHTML('beforeend',`
+    <div class="modal-bg" id="confirmModalBg" onclick="if(event.target.id==='confirmModalBg')closeConfirmModal()">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-hdr">
+          <div style="padding:12px 0 14px;font-size:13px;line-height:1.6;color:var(--t2)">${msg}</div>
+          <button class="btn bprim" onclick="confirmModalAction()">Confirmer</button>
+          <button class="btn bsec" style="margin-top:6px;margin-bottom:20px" onclick="closeConfirmModal()">Annuler</button>
+        </div>
+      </div>
+    </div>`);
+  window._confirmModalCb=onConfirm;
+}
+function confirmModalAction(){closeConfirmModal();if(window._confirmModalCb)window._confirmModalCb();}
+function closeConfirmModal(){const e=document.getElementById('confirmModalBg');if(e)e.remove();window._confirmModalCb=null;}
 
 /* ════════════════════════════════════
    INIT
