@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>FuelForce — Nutrition Sport</title>
+<meta name="theme-color" content="#090909">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FuelForce">
+<link rel="manifest" id="pwa-manifest">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ff:'Bebas Neue',sans-serif;--fs:'DM Sans',sans-serif;
+  --orange:#FF5A1F;--orange2:#FF7A47;--od:#FF5A1F18;
+  --dark:#090909;--c1:#141414;--c2:#1C1C1C;--c3:#252525;
+  --b1:#252525;--b2:#313131;
+  --text:#F0EDE8;--t2:#A8A49F;--mu:#4A4A4A;
+  --green:#3DD68C;--gd:#3DD68C18;
+  --red:#FF4D4D;--rd:#FF4D4D18;
+  --yellow:#FFB800;--yd:#FFB80018;
+  --blue:#4DA6FF;--bld:#4DA6FF18;
+  --purple:#A78BFA;--pd:#A78BFA18;
+  --teal:#2DD4BF;--td:#2DD4BF18;
+}
+html,body{background:var(--dark);color:var(--text);font-family:var(--fs);font-size:14px;min-height:100vh;overscroll-behavior:none;-webkit-font-smoothing:antialiased}
+.app{max-width:440px;margin:0 auto;padding-bottom:94px}
+
+/* ══ PRINT ══════════════════════════════ */
+@media print{
+  .header,.bnav,.splash,.toast,.no-print{display:none!important}
+  .app{max-width:100%;padding:0}
+  .step{display:block!important;padding:12px}
+  body{background:#fff;color:#111}
+  .card,.catres,.sc2,.recov-item{background:#f5f5f5;border-color:#ddd}
+  .hero{background:#f0f0f0;border-color:#ccc}
+  .heronum,.sn2{color:#FF5A1F}
+  .stitle{color:#111}
+  .abox.ag{background:#f0fff5;border-color:#3DD68C;color:#1a6b3c}
+  .abox.aw{background:#fffbf0;border-color:#FFB800;color:#7a5800}
+  .abox.ai{background:#f0f8ff;border-color:#4DA6FF;color:#1a4a7a}
+  .abox.ap{background:#f8f0ff;border-color:#A78BFA;color:#4a1a8a}
+  .timeline::before{background:#ccc}
+  .tl-card{background:#f5f5f5;border-color:#ddd}
+  .tl-detail,.tl-digest{color:#555}
+}
+
+/* ══ EXPRESS MODE ════════════════════════ */
+.express-overlay{position:fixed;inset:0;background:var(--dark);z-index:150;display:flex;flex-direction:column;padding:20px 16px;overflow-y:auto}
+.express-overlay.out{animation:.35s ease forwards splashOut}
+.expr-logo{font-family:var(--ff);font-size:20px;letter-spacing:2px;color:var(--orange);margin-bottom:20px}
+.expr-logo span{color:var(--text)}
+.expr-title{font-family:var(--ff);font-size:28px;letter-spacing:1px;margin-bottom:4px}
+.expr-sub{font-size:12px;color:var(--mu);margin-bottom:20px}
+.expr-q{font-size:13px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+.expr-opts{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:18px}
+.expr-opt{background:var(--c2);border:1.5px solid var(--b1);border-radius:9px;padding:10px 8px;cursor:pointer;text-align:center;transition:all .2s}
+.expr-opt:hover,.expr-opt.on{border-color:var(--orange);background:var(--od)}
+.expr-opt .eo-ico{font-size:22px;margin-bottom:3px}
+.expr-opt .eo-lbl{font-size:12px;font-weight:600}
+.expr-opt .eo-sub{font-size:10px;color:var(--mu);margin-top:1px}
+.expr-cta{width:100%;padding:13px;background:var(--orange);border:none;border-radius:10px;font-family:var(--ff);font-size:18px;letter-spacing:1px;color:#fff;cursor:pointer;transition:all .2s;margin-top:4px}
+.expr-cta:hover{background:var(--orange2)}
+.expr-back{width:100%;padding:10px;background:transparent;border:1px solid var(--b1);border-radius:10px;font-family:var(--fs);font-size:12px;color:var(--mu);cursor:pointer;margin-top:8px;transition:all .2s}
+.expr-back:hover{color:var(--text);border-color:var(--b2)}
+
+/* ══ SCORE RING ══════════════════════════ */
+.score-ring-wrap{display:flex;justify-content:center;margin-bottom:12px;position:relative}
+.score-ring{transform:rotate(-90deg)}
+.score-ring-bg{fill:none;stroke:var(--b1);stroke-width:8}
+.score-ring-fill{fill:none;stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset .8s ease}
+.score-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.score-num{font-family:var(--ff);font-size:32px;line-height:1}
+.score-lbl{font-size:9px;color:var(--mu);text-transform:uppercase;letter-spacing:.8px;margin-top:1px}
+
+/* ══ ALLERGEN SLOT BADGE ═════════════════ */
+.slot-allerg{position:absolute;bottom:6px;right:8px;font-size:9px;color:var(--yellow);opacity:.7}
+
+/* ══ SEASON GOAL ═════════════════════════ */
+.season-btns{display:flex;flex-direction:column;gap:5px;margin-bottom:9px}
+.season-item{background:var(--c2);border:1.5px solid var(--b1);border-radius:8px;padding:8px 12px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px;font-size:12px}
+.season-item.on{border-color:var(--orange);background:var(--od)}
+.season-ico{font-size:16px;flex-shrink:0}
+
+/* ══ DB DATE ═════════════════════════════ */
+.db-date{font-size:10px;color:var(--mu);text-align:right;padding:4px 0 8px;opacity:.6}
+
+/* ══ BUY LINK ════════════════════════════ */
+.buy-link{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--blue);margin-top:3px;text-decoration:none;opacity:.8}
+.buy-link:hover{opacity:1}
+
+/* ══ INSTALL BANNER ══════════════════════ */
+.install-banner{background:linear-gradient(135deg,#0A1A2A,#0D1F30);border:1px solid var(--bld);border-radius:10px;padding:11px 13px;margin-bottom:9px;display:flex;align-items:center;gap:10px}
+.install-banner .ib-text{flex:1;font-size:12px;line-height:1.4;color:var(--t2)}
+.install-banner .ib-text strong{color:var(--blue);display:block;margin-bottom:1px}
+.ib-btn{padding:7px 12px;background:var(--blue);border:none;border-radius:7px;color:#fff;font-family:var(--ff);font-size:13px;cursor:pointer;white-space:nowrap}
+.ib-close{background:none;border:none;color:var(--mu);cursor:pointer;font-size:18px;padding:0;flex-shrink:0}
+
+/* ══ NUTRIENT BARS (résultats) ═══════════ */
+.nutr-bars{display:flex;flex-direction:column;gap:6px;margin-bottom:9px}
+.nbar{display:flex;align-items:center;gap:8px}
+.nbar-lbl{font-size:11px;color:var(--t2);min-width:80px}
+.nbar-track{flex:1;height:5px;background:var(--b1);border-radius:3px;overflow:hidden}
+.nbar-fill{height:100%;border-radius:3px;transition:width .5s}
+
+/* ══ SPLASH ══════════════════════════════ */
+.splash{position:fixed;inset:0;background:var(--dark);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 24px;text-align:center}
+.splash.out{animation:.4s ease forwards splashOut}
+@keyframes splashOut{to{opacity:0;transform:translateY(-14px)}}
+.sp-logo{font-family:var(--ff);font-size:56px;letter-spacing:4px;color:var(--orange);line-height:1;margin-bottom:3px}
+.sp-logo span{color:var(--text)}
+.sp-tag{font-size:13px;color:var(--t2);margin-bottom:32px;letter-spacing:.3px}
+.sp-feats{display:flex;flex-direction:column;gap:10px;width:100%;max-width:310px;margin-bottom:36px}
+.sp-feat{display:flex;align-items:center;gap:12px;background:var(--c1);border:1px solid var(--b1);border-radius:11px;padding:12px 14px;text-align:left}
+.sp-ico{font-size:20px;flex-shrink:0}
+.sp-txt strong{color:var(--orange);display:block;font-size:13px;margin-bottom:1px}
+.sp-txt span{font-size:11px;color:var(--t2);line-height:1.4}
+.sp-cta{width:100%;max-width:310px;padding:15px;background:var(--orange);border:none;border-radius:11px;font-family:var(--ff);font-size:21px;letter-spacing:2px;color:#fff;cursor:pointer;transition:all .2s}
+.sp-cta:hover{background:var(--orange2)}
+.sp-cta:active{transform:scale(.98)}
+.sp-note{font-size:10px;color:var(--mu);margin-top:12px}
+.sp-glow{position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:300px;height:300px;background:radial-gradient(circle,#FF5A1F0C,transparent 70%);pointer-events:none}
+
+/* ══ HEADER ══════════════════════════════ */
+.header{padding:11px 14px 10px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;background:rgba(9,9,9,.96);backdrop-filter:blur(18px);border-bottom:1px solid var(--b1)}
+.logo{font-family:var(--ff);font-size:21px;letter-spacing:2px;color:var(--orange);display:flex;align-items:baseline;gap:3px}
+.logo span{color:var(--text)}
+.lver{font-family:var(--fs);font-size:9px;font-weight:600;color:var(--mu);background:var(--c2);padding:2px 5px;border-radius:3px;border:1px solid var(--b1);margin-left:3px}
+.hright{display:flex;align-items:center;gap:8px}
+.pills{display:flex;gap:3px}
+.pill{height:3px;border-radius:2px;background:var(--b1);transition:all .3s}
+.pill.done{background:var(--orange2);opacity:.35;width:18px}
+.pill.active{background:var(--orange);width:28px}
+.pill.todo{width:18px}
+.hbtn{background:none;border:1px solid var(--b1);border-radius:6px;padding:5px 9px;color:var(--t2);font-size:10px;cursor:pointer;font-family:var(--fs);font-weight:500;transition:all .2s;white-space:nowrap}
+.hbtn:hover{border-color:var(--orange);color:var(--orange)}
+
+/* ══ TOAST ═══════════════════════════════ */
+.toast{position:fixed;top:56px;left:50%;transform:translateX(-50%) translateY(-6px);background:var(--gd);border:1px solid var(--green);border-radius:8px;padding:5px 13px;font-size:11px;color:var(--green);z-index:500;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ══ STEPS ═══════════════════════════════ */
+.step{display:none;padding:13px 14px 0;animation:.22s ease up}
+.step.active{display:block}
+@keyframes up{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.stitle{font-family:var(--ff);font-size:29px;letter-spacing:1px;line-height:1;margin-bottom:2px}
+.ssub{color:var(--mu);font-size:11px;margin-bottom:13px}
+
+/* ══ CARDS ═══════════════════════════════ */
+.card{background:var(--c1);border:1px solid var(--b1);border-radius:13px;padding:14px;margin-bottom:9px}
+.row{display:flex;gap:9px;margin-bottom:9px}
+.row:last-child{margin-bottom:0}
+.f{flex:1}
+.lbl{display:block;font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;font-weight:500}
+input[type=number],select{width:100%;background:var(--c2);border:1px solid var(--b1);border-radius:7px;padding:9px 11px;color:var(--text);font-family:var(--fs);font-size:14px;font-weight:500;outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none}
+input[type=number]:focus,select:focus{border-color:var(--orange)}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%234A4A4A'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+select option{background:#1C1C1C}
+.ferr{font-size:10px;color:var(--red);margin-top:3px;display:none}
+.ferr.show{display:block}
+
+/* ══ SEGMENTS ════════════════════════════ */
+.seg{display:flex;background:var(--c2);border-radius:7px;padding:3px;gap:2px;margin-bottom:9px}
+.seg button{flex:1;padding:7px 2px;border:none;border-radius:5px;background:transparent;color:var(--mu);font-family:var(--fs);font-size:11px;cursor:pointer;transition:all .2s;white-space:nowrap;font-weight:500}
+.seg button.on{background:var(--orange);color:#fff;font-weight:600}
+
+/* ══ RANGE ════════════════════════════════ */
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:2px;background:var(--b1);outline:none;cursor:pointer;margin:5px 0 3px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:21px;height:21px;border-radius:50%;background:var(--orange);cursor:pointer;border:2px solid var(--dark);box-shadow:0 0 0 4px var(--od)}
+.rlabels{display:flex;justify-content:space-between;font-size:10px;color:var(--mu)}
+.rval{font-family:var(--ff);font-size:21px;line-height:1}
+.zbadge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:18px;font-size:12px;font-weight:600;margin-top:7px}
+
+/* ══ NIVEAU ══════════════════════════════ */
+.ngrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:9px}
+.nlevel{background:var(--c2);border:1.5px solid var(--b1);border-radius:9px;padding:9px 11px;cursor:pointer;transition:all .2s}
+.nlevel.on{border-color:var(--orange);background:var(--od)}
+.ntitle{font-size:12px;font-weight:600;margin-bottom:1px}
+.nsub{font-size:10px;color:var(--mu);line-height:1.3}
+.nrange{font-family:var(--ff);font-size:14px;color:var(--orange);margin-top:3px}
+
+/* ══ OBJECTIF ════════════════════════════ */
+.objlist{display:flex;flex-direction:column;gap:5px;margin-bottom:9px}
+.objitem{background:var(--c2);border:1.5px solid var(--b1);border-radius:9px;padding:9px 12px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:9px}
+.objitem.on{border-color:var(--orange);background:var(--od)}
+.obj-ico{font-size:19px;flex-shrink:0}
+.otitle{font-size:12px;font-weight:600}
+.osub{font-size:10px;color:var(--mu);margin-top:1px}
+
+/* ══ PRODUITS ════════════════════════════ */
+.psec{margin-bottom:13px}
+.pshead{display:flex;align-items:center;gap:7px;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--mu);margin-bottom:7px;font-weight:500}
+.psgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.pslot{background:var(--c2);border:1.5px solid var(--b1);border-radius:9px;padding:9px 11px;cursor:pointer;transition:border-color .2s,background .2s;position:relative;min-height:76px}
+.pslot:hover{border-color:var(--orange2)}
+.pslot.filled{border-color:var(--orange);background:#1C0E07}
+.pslot.flash{animation:.5s ease slotFlash}
+@keyframes slotFlash{0%{background:#FF5A1F44}100%{background:#1C0E07}}
+.slbl{font-size:9px;color:var(--mu);margin-bottom:2px;text-transform:uppercase;letter-spacing:.8px}
+.sname{font-size:12px;font-weight:600;line-height:1.3;padding-right:14px}
+.sbrand{font-size:10px;color:var(--mu);margin-top:1px}
+.sval{font-size:11px;color:var(--orange);margin-top:3px;font-weight:500}
+.sdel{position:absolute;top:5px;right:7px;font-size:17px;color:var(--mu);background:none;border:none;cursor:pointer;padding:0;line-height:1}
+.sdel:hover{color:var(--red)}
+.eslot{background:transparent;border:1.5px dashed var(--b1);border-radius:9px;min-height:76px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;width:100%;font-family:var(--fs);color:var(--mu);transition:all .2s;gap:3px}
+.eslot:hover{border-color:var(--orange2);color:var(--orange2)}
+.eplus{font-size:19px;line-height:1;color:var(--b2)}
+.eslot:hover .eplus{color:var(--orange2)}
+
+/* ══ RECO BANNER ═════════════════════════ */
+.reco{background:linear-gradient(135deg,#1A0E00,#1C1100);border:1px solid #FF5A1F30;border-radius:11px;padding:12px 13px;margin-bottom:9px}
+.reco-t{font-size:11px;font-weight:600;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.reco-d{font-size:11px;color:var(--t2);margin-bottom:9px;line-height:1.4}
+.budgbtns{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px}
+.bdbtn{padding:4px 10px;border-radius:5px;border:1px solid var(--b1);background:transparent;color:var(--mu);font-size:10px;cursor:pointer;font-family:var(--fs);transition:all .2s;font-weight:500}
+.bdbtn.on{background:var(--orange);border-color:var(--orange);color:#fff;font-weight:600}
+.reco-apply{width:100%;padding:8px;background:var(--od);border:1px solid var(--orange);border-radius:7px;color:var(--orange);font-family:var(--ff);font-size:15px;letter-spacing:1px;cursor:pointer;transition:all .2s}
+.reco-apply:hover{background:var(--orange);color:#fff}
+
+/* ══ GLUC BAR ════════════════════════════ */
+.glucbar{margin-bottom:11px}
+.glucbar-h{display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--mu);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.glucbar-t{background:var(--c2);border-radius:4px;height:7px;overflow:hidden;position:relative}
+.glucbar-f{height:100%;border-radius:4px;transition:width .4s ease}
+.glucbar-line{position:absolute;top:0;bottom:0;width:2px;background:rgba(255,255,255,.1)}
+.totbar{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:9px}
+.ti{background:var(--c1);border:1px solid var(--b1);border-radius:9px;padding:8px 4px;text-align:center}
+.tn{font-family:var(--ff);font-size:17px;line-height:1;margin-bottom:1px}
+.tl{font-size:9px;color:var(--mu);text-transform:uppercase;letter-spacing:.4px}
+
+/* ══ FRUCTOSE ════════════════════════════ */
+.fruc{background:linear-gradient(135deg,#1A0800,#200E00);border:1px solid #FF5A1F44;border-radius:9px;padding:11px 13px;margin-bottom:9px}
+.fruc-t{font-size:12px;font-weight:600;color:var(--orange);margin-bottom:4px}
+.fruc-b{font-size:11px;color:var(--t2);line-height:1.6}
+.fruc-p{margin-top:7px;display:flex;flex-wrap:wrap;gap:4px}
+.fruc-tag{font-size:10px;padding:2px 7px;border-radius:3px;background:var(--gd);color:var(--green);border:1px solid #3DD68C30}
+
+/* ══ PLANS SAUVEGARDÉS ═══════════════════ */
+.plans-panel{background:var(--c1);border:1px solid var(--b1);border-radius:11px;padding:12px;margin-bottom:9px}
+.plan-item{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid var(--b1);cursor:pointer;transition:opacity .15s}
+.plan-item:last-child{border-bottom:none}
+.plan-item:hover{opacity:.75}
+.plan-ico{font-size:18px;flex-shrink:0}
+.plan-name{font-size:12px;font-weight:600}
+.plan-meta{font-size:10px;color:var(--mu);margin-top:1px}
+.plan-del{margin-left:auto;background:none;border:none;color:var(--mu);cursor:pointer;font-size:16px;padding:2px 4px;flex-shrink:0}
+.plan-del:hover{color:var(--red)}
+.save-plan-btn{width:100%;padding:9px;border:1.5px dashed var(--b2);border-radius:8px;background:transparent;color:var(--mu);font-family:var(--fs);font-size:12px;cursor:pointer;transition:all .2s;margin-top:8px}
+.save-plan-btn:hover{border-color:var(--orange);color:var(--orange)}
+
+/* ══ SHARE PANEL ═════════════════════════ */
+.share-panel{background:var(--c1);border:1px solid var(--b1);border-radius:11px;padding:12px;margin-bottom:9px}
+.share-title{font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.share-btns{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.sbtn{padding:10px 8px;border-radius:8px;border:1px solid var(--b1);background:var(--c2);color:var(--text);font-family:var(--fs);font-size:11px;font-weight:500;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:4px}
+.sbtn:hover{border-color:var(--orange);color:var(--orange)}
+.sbtn .sico{font-size:18px}
+
+/* ══ MODAL ════════════════════════════════ */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:100;display:flex;align-items:flex-end;justify-content:center}
+.modal{background:var(--c1);border-radius:18px 18px 0 0;padding:16px 14px 0;width:100%;max-width:440px;max-height:80vh;display:flex;flex-direction:column;border-top:1px solid var(--b2)}
+.modal-hdr{flex-shrink:0;padding-bottom:8px}
+.modal-scroll{overflow-y:auto;flex:1;padding-bottom:26px;-webkit-overflow-scrolling:touch}
+.modal-scroll::-webkit-scrollbar{width:2px}
+.modal-scroll::-webkit-scrollbar-thumb{background:var(--b2);border-radius:1px}
+.mtitle{font-family:var(--ff);font-size:18px;letter-spacing:1px}
+.msearch{width:100%;background:var(--c2);border:1px solid var(--b1);border-radius:7px;padding:8px 12px;color:var(--text);font-family:var(--fs);font-size:13px;outline:none;margin:7px 0 6px;transition:border-color .2s}
+.msearch:focus{border-color:var(--orange)}
+.catbar{display:flex;gap:4px;overflow-x:auto;padding-bottom:7px;scrollbar-width:none}
+.catbar::-webkit-scrollbar{display:none}
+.catbtn{padding:3px 10px;border-radius:14px;border:1px solid var(--b1);background:transparent;color:var(--mu);font-size:10px;cursor:pointer;white-space:nowrap;transition:all .2s;font-family:var(--fs);font-weight:500}
+.catbtn.on{background:var(--orange);border-color:var(--orange);color:#fff}
+.pitem{display:flex;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--b1);cursor:pointer;transition:opacity .15s;gap:9px}
+.pitem:hover{opacity:.7}
+.pitem:last-child{border-bottom:none}
+.pl{flex:1;min-width:0}
+.pname{font-weight:600;font-size:13px}
+.pbrand{font-size:11px;color:var(--mu)}
+.pnote{font-size:10px;color:var(--mu);opacity:.6;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pallerg{font-size:10px;color:var(--yellow);margin-top:2px}
+.ptags{margin-top:3px;display:flex;flex-wrap:wrap;gap:3px}
+.pr{text-align:right;flex-shrink:0;padding-top:2px}
+.pgluc{font-size:15px;font-weight:700;color:var(--orange);line-height:1}
+.pprix{font-size:10px;color:var(--mu);margin-top:2px}
+.pratio{font-size:9px;margin-top:2px;padding:1px 4px;border-radius:3px;background:var(--gd);color:var(--green)}
+.tag{display:inline-block;font-size:9px;padding:1px 5px;border-radius:3px;font-weight:500}
+.tnat{background:var(--bld);color:var(--blue)}
+.tdiy{background:var(--gd);color:var(--green)}
+.tcaf{background:var(--pd);color:var(--purple)}
+.telite{background:var(--od);color:var(--orange2)}
+.teco{background:var(--gd);color:var(--green)}
+.tprem{background:var(--yd);color:var(--yellow)}
+.trecov{background:var(--td);color:var(--teal)}
+
+/* ══ TIP ══════════════════════════════════ */
+.tip{display:flex;gap:9px;padding:8px 11px;background:var(--c2);border-radius:7px;margin-bottom:7px;font-size:11px;line-height:1.5;align-items:flex-start}
+.tipico{font-size:14px;flex-shrink:0;margin-top:1px}
+
+/* ══ RÉSULTATS ════════════════════════════ */
+.restabs{display:flex;background:var(--c2);border-radius:7px;padding:3px;gap:2px;margin-bottom:11px}
+.restab{flex:1;padding:7px 3px;border:none;border-radius:5px;background:transparent;color:var(--mu);font-family:var(--fs);font-size:10px;cursor:pointer;transition:all .2s;font-weight:500}
+.restab.on{background:var(--c1);color:var(--text);border:1px solid var(--b1)}
+.respanel{display:none}
+.respanel.active{display:block}
+
+.hero{background:linear-gradient(145deg,#130800,#1C1000);border:1px solid #FF5A1F25;border-radius:13px;padding:16px;margin-bottom:9px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-35px;left:50%;transform:translateX(-50%);width:200px;height:200px;background:radial-gradient(circle,#FF5A1F0D,transparent 70%);pointer-events:none}
+.heronum{font-family:var(--ff);font-size:56px;color:var(--orange);line-height:1;position:relative}
+.herolbl{font-size:10px;color:var(--mu);letter-spacing:1.2px;text-transform:uppercase;margin-top:1px}
+.herorow{display:flex;justify-content:center;gap:16px;margin-top:11px;padding-top:11px;border-top:1px solid var(--b1)}
+.hstat-n{font-family:var(--ff);font-size:18px;line-height:1;margin-bottom:1px}
+.hstat-l{font-size:9px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px}
+.sg2{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:9px}
+.sc2{background:var(--c1);border:1px solid var(--b1);border-radius:11px;padding:12px;text-align:center}
+.sn2{font-family:var(--ff);font-size:25px;line-height:1;margin-bottom:2px}
+.sl2{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.6px}
+.catres{background:var(--c1);border:1px solid var(--b1);border-radius:11px;padding:12px;margin-bottom:7px}
+.crh{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.crn{font-size:13px;font-weight:600}
+.crs{font-size:11px;padding:3px 8px;border-radius:14px;font-weight:500}
+.ok{background:var(--gd);color:var(--green)}.ov{background:var(--yd);color:var(--yellow)}.def{background:var(--rd);color:var(--red)}
+.pbar{height:4px;border-radius:2px;background:var(--b1);overflow:hidden;margin-bottom:4px}
+.pfill{height:100%;border-radius:2px;transition:width .5s}
+.pok{background:var(--green)}.pov{background:var(--yellow)}.pdef{background:var(--red)}
+.crd{font-size:11px;color:var(--mu);display:flex;justify-content:space-between}
+.abox{border-radius:9px;padding:10px 12px;margin-bottom:7px;font-size:11px;line-height:1.6}
+.aw{background:#1A1000;border:1px solid #4D3500;color:var(--yellow)}
+.ai{background:#001020;border:1px solid #003060;color:var(--blue)}
+.ag{background:#001A0A;border:1px solid #004020;color:var(--green)}
+.ap{background:#12082A;border:1px solid #3D1A70;color:var(--purple)}
+
+/* ══ GEAR ═════════════════════════════════ */
+.gear{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--b1)}
+.gear:last-child{border-bottom:none}
+.gqty{font-family:var(--ff);font-size:21px;color:var(--orange);white-space:nowrap;margin-left:9px}
+.gqty small{font-size:10px;font-family:var(--fs);font-weight:400;color:var(--mu)}
+.ginfo{font-size:10px;color:var(--mu);margin-top:1px}
+
+/* ══ PROGRESSION ══════════════════════════ */
+.prog-week{display:flex;flex-direction:column;gap:6px;margin-bottom:9px}
+.pw-item{background:var(--c1);border:1px solid var(--b1);border-radius:9px;padding:10px 12px;display:flex;align-items:center;gap:10px}
+.pw-badge{font-family:var(--ff);font-size:11px;padding:3px 8px;border-radius:5px;flex-shrink:0;min-width:50px;text-align:center}
+.pw-current{background:var(--od);color:var(--orange);border:1px solid var(--orange)30}
+.pw-next{background:var(--gd);color:var(--green);border:1px solid var(--green)30}
+.pw-future{background:var(--b1);color:var(--mu)}
+.pw-body{flex:1}
+.pw-title{font-size:12px;font-weight:600;margin-bottom:2px}
+.pw-sub{font-size:10px;color:var(--mu)}
+
+/* ══ TIMELINE ═════════════════════════════ */
+.timeline{position:relative;padding-left:50px;margin-bottom:4px}
+.timeline::before{content:'';position:absolute;left:19px;top:8px;bottom:8px;width:2px;background:var(--b1);border-radius:2px}
+.tl-ev{position:relative;margin-bottom:9px}
+.tl-dot{position:absolute;left:-38px;top:5px;width:10px;height:10px;border-radius:50%;border:2px solid var(--dark)}
+.tl-dot.eat{background:var(--orange)}.tl-dot.drink{background:var(--blue)}
+.tl-dot.gel{background:var(--green)}.tl-dot.caf{background:var(--purple)}
+.tl-dot.finish{background:var(--teal)}.tl-dot.info{background:var(--mu)}
+.tl-time{position:absolute;left:-50px;top:2px;font-family:var(--ff);font-size:12px;color:var(--mu);text-align:right;width:40px;line-height:1.4}
+.tl-time.key{color:var(--orange)}
+.tl-card{background:var(--c2);border:1px solid var(--b1);border-radius:7px;padding:7px 11px}
+.tl-what{font-size:12px;font-weight:600;margin-bottom:1px;display:flex;align-items:center;gap:5px}
+.tl-detail{font-size:11px;color:var(--mu);line-height:1.4}
+.tl-digest{font-size:10px;color:var(--mu);opacity:.55;margin-top:2px;font-style:italic}
+.tl-gluc{margin-left:auto;font-family:var(--ff);font-size:12px}
+
+/* ══ RÉCUP ════════════════════════════════ */
+.recov-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:9px}
+.recov-item{background:var(--c1);border:1px solid var(--b1);border-radius:9px;padding:10px 6px;text-align:center}
+.recov-n{font-family:var(--ff);font-size:21px;line-height:1;margin-bottom:2px}
+.recov-l{font-size:9px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px}
+.recov-s{font-size:10px;color:var(--t2);margin-top:3px}
+
+/* ══ TRAIL EXTRA ══════════════════════════ */
+.trail-extra{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:9px}
+.te-card{background:var(--c2);border:1px solid var(--b1);border-radius:9px;padding:10px 11px}
+
+/* ══ SLABEL ═══════════════════════════════ */
+.slabel{font-family:var(--ff);font-size:16px;letter-spacing:1px;margin:13px 0 7px;color:var(--mu)}
+
+/* ══ BOTTOM NAV ══════════════════════════ */
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:440px;background:rgba(16,16,16,.98);backdrop-filter:blur(16px);border-top:1px solid var(--b1);padding:9px 14px 20px;display:flex;gap:7px;z-index:50}
+.btn{display:block;width:100%;padding:12px;border-radius:10px;border:none;font-family:var(--ff);font-size:16px;letter-spacing:1px;cursor:pointer;transition:all .2s;text-align:center;margin:0}
+.bprim{background:var(--orange);color:#fff}
+.bprim:hover{background:var(--orange2)}
+.bprim:active{transform:scale(.98)}
+.bsec{background:transparent;border:1px solid var(--b1);color:var(--text)}
+.bsec:hover{border-color:var(--orange);color:var(--orange)}
+
+/* ══ MISC ═════════════════════════════════ */
+.empty{text-align:center;padding:18px;color:var(--mu);font-size:12px}
+.eico{font-size:26px;margin-bottom:7px}
+.footnote{text-align:center;color:var(--mu);font-size:10px;padding:13px 0;opacity:.4;line-height:1.6}
+.wbtn{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;background:var(--c2);border:1px solid var(--b1);border-radius:7px;font-size:11px;color:var(--t2);margin-bottom:9px;cursor:pointer;transition:all .2s;font-family:var(--fs);font-weight:500}
+.wbtn:hover{border-color:var(--orange);color:var(--orange)}
+.wbtn.loading{color:var(--mu);pointer-events:none}
+.divider{height:1px;background:var(--b1);margin:10px 0}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div class="splash" id="splash">
+  <div class="sp-glow"></div>
+  <div class="sp-logo">FUEL<span>FORCE</span></div>
+  <div class="sp-tag">Ton plan nutrition sport, calibré à la science</div>
+  <div class="sp-feats">
+    <div class="sp-feat"><div class="sp-ico">🎯</div><div class="sp-txt"><strong>Glucides au gramme près</strong><span>METs validés (Ainsworth 2011) · Adapté à ton niveau</span></div></div>
+    <div class="sp-feat"><div class="sp-ico">⏱</div><div class="sp-txt"><strong>Timeline heure par heure</strong><span>Quoi prendre, quand, avec le timing de digestion</span></div></div>
+    <div class="sp-feat"><div class="sp-ico">💾</div><div class="sp-txt"><strong>Plans sauvegardés</strong><span>Crée et compare plusieurs plans course</span></div></div>
+    <div class="sp-feat"><div class="sp-ico">🛒</div><div class="sp-txt"><strong>95+ produits référencés</strong><span>Tous budgets · Allergènes · Ratio 2:1</span></div></div>
+  </div>
+  <button class="sp-cta" onclick="startApp()">CRÉER MON PLAN →</button>
+  <button style="width:100%;max-width:310px;padding:11px;background:transparent;border:1px solid var(--b1);border-radius:11px;font-family:var(--fs);font-size:13px;color:var(--t2);cursor:pointer;margin-top:8px;transition:all .2s" onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='var(--b1)'" onclick="startExpress()">⚡ Mode Express — résultat en 30 secondes</button>
+  <div class="sp-note">Gratuit · Sans inscription · Données 100% locales</div>
+</div>
+
+<!-- EXPRESS MODE -->
+<div class="express-overlay" id="expressOverlay" style="display:none"></div>
+
+<!-- INSTALL BANNER -->
+<div class="install-banner no-print" id="installBanner" style="display:none;position:fixed;bottom:100px;left:50%;transform:translateX(-50%);width:calc(100% - 28px);max-width:412px;z-index:45">
+  <div class="ib-text"><strong>📱 Installer FuelForce</strong>Ajoute l'app à ton écran d'accueil</div>
+  <button class="ib-btn" onclick="installPWA()">INSTALLER</button>
+  <button class="ib-close" onclick="dismissInstall()">×</button>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">✓ Sauvegardé</div>
+
+<!-- APP -->
+<div class="app" id="app" style="display:none">
+  <div class="header">
+    <div class="logo">FUEL<span>FORCE</span><span class="lver">4.1</span></div>
+    <div class="hright">
+      <button class="hbtn no-print" onclick="showPlans()">📋 Plans</button>
+      <div class="pills" id="pills"></div>
+    </div>
+  </div>
+  <div id="steps"></div>
+  <div class="bnav no-print" id="bnav"></div>
+</div>
+
+<script>
+/* ════════════════════════════════════
+   METs SCIENTIFIQUES (Ainsworth 2011)
+════════════════════════════════════ */
+const METS={
+  velo:     [3.5,6.8,9.5,11.8,14.0],
+  trail:    [4.5,7.5,10.0,12.5,15.0],
+  course:   [4.0,7.0,10.5,13.0,16.0],
+  triathlon:[4.0,7.0,9.8,12.0,14.5],
+};
+
+/* ════════════════════════════════════
+   BASE PRODUITS — 95+ références
+════════════════════════════════════ */
+const P=[ /* id,name,brand,cat,gluc,sod,prix,note,tags[],budget,ratio2to1,allergenes[],digestMin */
+  /* ── BOISSONS ── */
+  {id:'c30',name:'C30 Drink Mix',brand:'Neversecond',cat:'boisson',gluc:30,sod:200,prix:2.5,note:'Ratio 2:1 Gluc/Fruc, électrolytes complets',tags:['elite'],budget:'mid',ratio2to1:true,allergenes:[],digestMin:0},
+  {id:'tailwind',name:'Endurance Fuel',brand:'Tailwind',cat:'boisson',gluc:25,sod:310,prix:2.8,note:'Tout-en-un énergie + électrolytes, très digeste',tags:[],budget:'mid',ratio2to1:false,allergenes:[],digestMin:0},
+  {id:'maurten160',name:'Drink Mix 160',brand:'Maurten',cat:'boisson',gluc:40,sod:140,prix:3.5,note:'Hydrogel isotonique breveté',tags:['elite'],budget:'prem',ratio2to1:true,allergenes:['gluten'],digestMin:0},
+  {id:'maurten320',name:'Drink Mix 320',brand:'Maurten',cat:'boisson',gluc:80,sod:500,prix:4.2,note:'Charge max 80g/bidon — races longues élite',tags:['elite'],budget:'prem',ratio2to1:true,allergenes:['gluten'],digestMin:0},
+  {id:'sis_beta_drink',name:'Beta Fuel Drink',brand:'SiS',cat:'boisson',gluc:80,sod:225,prix:3.2,note:'80g/bidon ratio 1:0.8, niveau élite',tags:['elite'],budget:'prem',ratio2to1:true,allergenes:[],digestMin:0},
+  {id:'nduranz',name:'NRGY Unit Drink',brand:'Nduranz',cat:'boisson',gluc:37,sod:405,prix:2.6,note:'Très riche en sodium — chaleur extrême',tags:[],budget:'mid',ratio2to1:false,allergenes:[],digestMin:0},
+  {id:'diy_miel',name:'Eau+sel+miel DIY',brand:'DIY',cat:'boisson',gluc:17,sod:500,prix:0.2,note:'500ml eau, 1 c.c. sel, 30g miel',tags:['diy'],budget:'eco',ratio2to1:false,allergenes:[],digestMin:0},
+  {id:'pf90',name:'PF 90 Drink Mix',brand:'Precision Fuel',cat:'boisson',gluc:90,sod:300,prix:3.8,note:'90g/h ratio 2:1 — charge max élite',tags:['elite'],budget:'prem',ratio2to1:true,allergenes:[],digestMin:0},
+  {id:'nuun_sport',name:'Nuun Sport (tabs)',brand:'Nuun',cat:'boisson',gluc:4,sod:300,prix:0.7,note:'Électrolytes seuls, comprimé effervescent',tags:[],budget:'eco',ratio2to1:false,allergenes:[],digestMin:0},
+  {id:'ph1500',name:'PH 1500',brand:'Precision Hydration',cat:'boisson',gluc:0,sod:500,prix:1.4,note:'Électrolytes ultra-concentrés sans sucre',tags:[],budget:'mid',ratio2to1:false,allergenes:[],digestMin:0},
+  {id:'apt_bois',name:'Boisson Effort',brand:'Aptonia',cat:'boisson',gluc:40,sod:180,prix:1.0,note:'Décathlon — meilleur rapport qualité/prix',tags:[],budget:'eco',ratio2to1:false,allergenes:[],digestMin:0},
+  {id:'apt_iso',name:'Boisson Iso',brand:'Aptonia',cat:'boisson',gluc:30,sod:220,prix:0.9,note:'Décathlon — sorties courtes',tags:[],budget:'eco',ratio2to1:false,allergenes:[],digestMin:0},
+  {id:'skratch',name:'Sport Hydration Mix',brand:'Skratch Labs',cat:'boisson',gluc:20,sod:380,prix:2.1,note:'Ingrédients réels, sodium élevé',tags:['nat'],budget:'mid',ratio2to1:false,allergenes:[],digestMin:0},
+  {id:'overstims_h',name:'Hydrixir Antioxydant',brand:'Overstim.s',cat:'boisson',gluc:35,sod:160,prix:2.1,note:'Antioxydants + vitamines, fabrication FR',tags:[],budget:'mid',ratio2to1:false,allergenes:[],digestMin:0},
+  {id:'eaudecoco',name:'Eau de coco',brand:'Naturel',cat:'boisson',gluc:11,sod:105,prix:1.5,note:'Potassium naturel, récupération active',tags:['nat','diy'],budget:'eco',ratio2to1:false,allergenes:[],digestMin:0},
+  {id:'diy_citron',name:'Limonade maison',brand:'DIY',cat:'boisson',gluc:22,sod:420,prix:0.3,note:'500ml, citron, sel, sirop agave',tags:['diy','nat'],budget:'eco',ratio2to1:false,allergenes:[],digestMin:0},
+  /* ── GELS ── */
+  {id:'gel100',name:'Gel 100',brand:'Maurten',cat:'gel',gluc:25,sod:20,prix:3.2,note:'Hydrogel breveté, absorption maximale',tags:['elite'],budget:'prem',ratio2to1:true,allergenes:['gluten'],digestMin:10},
+  {id:'go_iso',name:'GO Isotonic Gel',brand:'SiS',cat:'gel',gluc:22,sod:20,prix:1.5,note:'Isotonique, sans eau — idéal course à pied',tags:[],budget:'eco',ratio2to1:false,allergenes:[],digestMin:10},
+  {id:'pf30',name:'PF 30 Gel',brand:'Precision Fuel',cat:'gel',gluc:30,sod:15,prix:2.8,note:'Peu de fructose, tolérance maximale',tags:['elite'],budget:'mid',ratio2to1:true,allergenes:[],digestMin:12},
+  {id:'pf45',name:'PF 45 Gel',brand:'Precision Fuel',cat:'gel',gluc:45,sod:400,prix:3.2,note:'45g glucides + électrolytes complets',tags:['elite'],budget:'prem',ratio2to1:true,allergenes:[],digestMin:15},
+  {id:'nrgy_gel',name:'NRGY Unit Gel',brand:'Nduranz',cat:'gel',gluc:45,sod:400,prix:2.5,note:'Concentration max, très riche en sel',tags:[],budget:'mid',ratio2to1:true,allergenes:[],digestMin:15},
+  {id:'gu_orig',name:'Original Gel',brand:'GU Energy',cat:'gel',gluc:22,sod:55,prix:1.4,note:'Classique, 20+ saveurs, BCAA inclus',tags:[],budget:'eco',ratio2to1:false,allergenes:['lait'],digestMin:10},
+  {id:'spring',name:'Awesome Sauce',brand:'Spring Energy',cat:'gel',gluc:33,sod:90,prix:3.1,note:'Purée 100% naturelle — patate douce+miel',tags:['nat'],budget:'prem',ratio2to1:false,allergenes:[],digestMin:15},
+  {id:'huma',name:'Huma Gel',brand:'Huma',cat:'gel',gluc:23,sod:40,prix:2.4,note:'Fruits bio + chia, 100% naturel',tags:['nat'],budget:'mid',ratio2to1:false,allergenes:[],digestMin:12},
+  {id:'pb_gel',name:'PowerGel Original',brand:'PowerBar',cat:'gel',gluc:27,sod:200,prix:1.5,note:'C2MAX ratio 2:1, riche en sel',tags:[],budget:'eco',ratio2to1:true,allergenes:[],digestMin:10},
+  {id:'apt_gel',name:'Gel Énergie Sport',brand:'Aptonia',cat:'gel',gluc:22,sod:30,prix:0.7,note:'Décathlon — meilleur rapport qualité/prix',tags:[],budget:'eco',ratio2to1:false,allergenes:[],digestMin:10},
+  {id:'clif_shot',name:'Shot Gel',brand:'Clif',cat:'gel',gluc:24,sod:55,prix:1.6,note:'Bio certifié, texture lisse',tags:['nat'],budget:'eco',ratio2to1:false,allergenes:['gluten'],digestMin:12},
+  {id:'diy_gel',name:'Gel miel+sel DIY',brand:'DIY',cat:'gel',gluc:17,sod:300,prix:0.2,note:'30g miel + pincée sel, poche silicone',tags:['diy','nat'],budget:'eco',ratio2to1:false,allergenes:[],digestMin:8},
+  {id:'vfuel',name:'Endurance Gel',brand:'VFuel',cat:'gel',gluc:24,sod:100,prix:2.0,note:'Pommes de terre + sel de mer, trail',tags:['nat'],budget:'mid',ratio2to1:false,allergenes:[],digestMin:12},
+  /* ── GELS CAFÉINE ── */
+  {id:'gel100caf',name:'Gel 100 CAF 100',brand:'Maurten',cat:'gel_caf',gluc:25,sod:20,prix:3.5,note:'100mg caféine — 30-40min avant arrivée',tags:['elite','caf'],budget:'prem',ratio2to1:true,allergenes:['gluten'],digestMin:10},
+  {id:'go_caf',name:'GO Gel CAF 75mg',brand:'SiS',cat:'gel_caf',gluc:22,sod:20,prix:1.7,note:'75mg caféine, isotonique',tags:['caf'],budget:'eco',ratio2to1:false,allergenes:[],digestMin:10},
+  {id:'overstims_caf',name:'Coup de Fouet',brand:'Overstim.s',cat:'gel_caf',gluc:20,sod:10,prix:1.3,note:'60mg caféine, fabrication FR',tags:['caf'],budget:'eco',ratio2to1:false,allergenes:[],digestMin:10},
+  {id:'pf30_caf',name:'PF 30 CAF 100mg',brand:'Precision Fuel',cat:'gel_caf',gluc:30,sod:15,prix:3.0,note:'100mg caféine, peu de fructose',tags:['elite','caf'],budget:'prem',ratio2to1:true,allergenes:[],digestMin:10},
+  {id:'clif_caf',name:'Shot CAF 100mg',brand:'Clif',cat:'gel_caf',gluc:24,sod:55,prix:1.9,note:'100mg caféine, bio certifié',tags:['nat','caf'],budget:'mid',ratio2to1:false,allergenes:['gluten'],digestMin:10},
+  {id:'apt_caf',name:'Gel Caféine 80mg',brand:'Aptonia',cat:'gel_caf',gluc:22,sod:30,prix:0.8,note:'Décathlon — 80mg caféine, prix imbattable',tags:['caf'],budget:'eco',ratio2to1:false,allergenes:[],digestMin:10},
+  {id:'pb_caf',name:'PowerGel Caféine',brand:'PowerBar',cat:'gel_caf',gluc:27,sod:200,prix:1.7,note:'50mg caféine + C2MAX',tags:['caf'],budget:'eco',ratio2to1:true,allergenes:[],digestMin:10},
+  /* ── GOMMES ── */
+  {id:'pb_shots',name:'Gel Shots',brand:'PowerBar',cat:'gommes',gluc:48,sod:120,prix:2.1,note:'Format bonbon x6, à fractionner',tags:[],budget:'eco',ratio2to1:true,allergenes:[],digestMin:20},
+  {id:'clif_bloks',name:'Shot Bloks',brand:'Clif',cat:'gommes',gluc:24,sod:70,prix:2.0,note:'3 blocs = 1 portion, facile à doser',tags:['nat'],budget:'eco',ratio2to1:false,allergenes:['gluten'],digestMin:20},
+  {id:'honey_chews',name:'Energy Chews Bio',brand:'Honey Stinger',cat:'gommes',gluc:39,sod:60,prix:2.4,note:'Miel biologique, saveurs fruitées',tags:['nat'],budget:'mid',ratio2to1:false,allergenes:[],digestMin:20},
+  {id:'sport_beans',name:'Sport Beans',brand:'Jelly Belly',cat:'gommes',gluc:25,sod:80,prix:1.8,note:'Format pocket facile',tags:[],budget:'eco',ratio2to1:false,allergenes:[],digestMin:15},
+  /* ── SOLIDES ── */
+  {id:'clif_bar',name:'Barre Chocolat',brand:'Clif Bar',cat:'solide',gluc:45,sod:150,prix:2.2,note:'Idéal en début de sortie longue',tags:['nat'],budget:'mid',ratio2to1:false,allergenes:['gluten','soja'],digestMin:40},
+  {id:'veloforte',name:'Barre Pronto',brand:'Veloforte',cat:'solide',gluc:22,sod:40,prix:2.9,note:'100% naturel, texture artisanale',tags:['nat'],budget:'prem',ratio2to1:false,allergenes:['fruits à coque'],digestMin:35},
+  {id:'apt_pate',name:"Pâte d'amande",brand:'Aptonia',cat:'solide',gluc:16,sod:10,prix:0.6,note:'Décathlon — budget, digeste',tags:[],budget:'eco',ratio2to1:false,allergenes:['fruits à coque'],digestMin:30},
+  {id:'pain_epices',name:"Pain d'épices",brand:'Naturel',cat:'solide',gluc:22,sod:150,prix:0.2,note:'Index glycémique élevé',tags:['nat','diy'],budget:'eco',ratio2to1:false,allergenes:['gluten'],digestMin:25},
+  {id:'sis_bar',name:'GO Energy Bar',brand:'SiS',cat:'solide',gluc:26,sod:45,prix:1.8,note:'Sans gluten, facile à mâcher',tags:[],budget:'eco',ratio2to1:false,allergenes:[],digestMin:35},
+  {id:'apt_barre',name:'Barre Céréales',brand:'Aptonia',cat:'solide',gluc:27,sod:55,prix:0.8,note:'Décathlon — excellent rapport qualité/prix',tags:[],budget:'eco',ratio2to1:false,allergenes:['gluten','lait'],digestMin:35},
+  {id:'baouw',name:'Barre Ultra Trail',brand:'BAOUW',cat:'solide',gluc:26,sod:75,prix:2.3,note:'Bio, conçu pour le trail',tags:['nat'],budget:'mid',ratio2to1:false,allergenes:[],digestMin:35},
+  {id:'honey_waffle',name:'Gaufre au miel',brand:'Honey Stinger',cat:'solide',gluc:29,sod:95,prix:2.0,note:'Très digeste, idéal début de sortie',tags:['nat'],budget:'mid',ratio2to1:false,allergenes:['gluten','lait'],digestMin:20},
+  {id:'rice_cake',name:'Rice Cake sel+miel',brand:'DIY',cat:'solide',gluc:35,sod:200,prix:0.3,note:'Riz+sel+sirop érable, recette Velominati',tags:['diy','nat'],budget:'eco',ratio2to1:false,allergenes:[],digestMin:30},
+  {id:'panini',name:'Panini mozza-miel',brand:'DIY',cat:'solide',gluc:38,sod:300,prix:0.5,note:'Idéal ultra trail > 4h',tags:['diy','nat'],budget:'eco',ratio2to1:false,allergenes:['gluten','lait'],digestMin:40},
+  /* ── NATURELS ── */
+  {id:'banane',name:'Banane mûre',brand:'Naturel',cat:'naturel',gluc:27,sod:1,prix:0.3,note:'Potassium, anti-crampes, très toléré',tags:['nat'],budget:'eco',ratio2to1:false,allergenes:[],digestMin:20},
+  {id:'dattes',name:'Dattes Medjool x2',brand:'Naturel',cat:'naturel',gluc:36,sod:2,prix:0.8,note:'Index glycémique élevé, boost rapide',tags:['nat'],budget:'eco',ratio2to1:false,allergenes:[],digestMin:15},
+  {id:'compote',name:'Compote gourde',brand:'Naturel',cat:'naturel',gluc:12,sod:2,prix:0.5,note:'Format bébé 90g, ultra-digeste',tags:['nat'],budget:'eco',ratio2to1:false,allergenes:[],digestMin:10},
+  {id:'bretzels',name:'Bretzels 25g',brand:'Naturel',cat:'naturel',gluc:14,sod:300,prix:0.3,note:'Sodium massif — idéal par chaleur',tags:['nat'],budget:'eco',ratio2to1:false,allergenes:['gluten'],digestMin:15},
+  {id:'raisins',name:'Raisins secs 30g',brand:'Naturel',cat:'naturel',gluc:23,sod:5,prix:0.3,note:'Sucre rapide, format pocket',tags:['nat'],budget:'eco',ratio2to1:false,allergenes:[],digestMin:15},
+  {id:'miel',name:'Sachet miel 14g',brand:'Naturel',cat:'naturel',gluc:12,sod:1,prix:0.3,note:'Énergie pure et rapide',tags:['nat'],budget:'eco',ratio2to1:false,allergenes:[],digestMin:8},
+  {id:'puree_pd',name:'Purée patate douce',brand:'DIY',cat:'naturel',gluc:20,sod:150,prix:0.3,note:'Patate douce+sel+cannelle en gourde',tags:['diy','nat'],budget:'eco',ratio2to1:false,allergenes:[],digestMin:15},
+  {id:'cacahuetes',name:'Cacahuètes salées',brand:'Naturel',cat:'naturel',gluc:5,sod:250,prix:0.3,note:'Sodium + lipides, réservé > 4h',tags:['nat'],budget:'eco',ratio2to1:false,allergenes:['fruits à coque'],digestMin:30},
+  /* ── RÉCUPÉRATION ── */
+  {id:'apt_recup',name:'Boisson Récupération',brand:'Aptonia',cat:'recup',gluc:35,sod:220,prix:1.5,note:'Décathlon — 15g protéines, glucides+sel',tags:['recov'],budget:'eco',ratio2to1:false,allergenes:['lait'],digestMin:0},
+  {id:'for_recup',name:'Protein Recovery',brand:'FOR',cat:'recup',gluc:28,sod:180,prix:2.8,note:'20g protéines, ratio 4:1 gluc:protéines',tags:['recov'],budget:'mid',ratio2to1:false,allergenes:['lait'],digestMin:0},
+  {id:'sis_recup',name:'REGO Rapid Recovery',brand:'SiS',cat:'recup',gluc:32,sod:240,prix:2.2,note:'22g protéines, leucine + electrolytes',tags:['recov'],budget:'mid',ratio2to1:false,allergenes:['lait'],digestMin:0},
+  {id:'maurten_mix_recup',name:'Drink Mix Récup',brand:'Maurten',cat:'recup',gluc:40,sod:140,prix:3.8,note:'Hydrogel + protéines 15g, digestion maximale',tags:['recov','elite'],budget:'prem',ratio2to1:false,allergenes:['gluten'],digestMin:0},
+  {id:'whey_diy',name:'Whey + lait + banane',brand:'DIY',cat:'recup',gluc:40,sod:120,prix:0.8,note:'30g whey + 250ml lait + 1 banane, recette standard',tags:['diy','recov'],budget:'eco',ratio2to1:false,allergenes:['lait'],digestMin:0},
+  {id:'apt_bar_recup',name:'Barre Protéinée Récup',brand:'Aptonia',cat:'recup',gluc:20,sod:90,prix:1.2,note:'Décathlon — 15g protéines, format solide',tags:['recov'],budget:'eco',ratio2to1:false,allergenes:['lait','gluten'],digestMin:0},
+  {id:'skyr_banane',name:'Skyr + miel + banane',brand:'DIY',cat:'recup',gluc:38,sod:80,prix:0.9,note:'200g skyr + miel + banane, lactoferrine naturelle',tags:['diy','recov','nat'],budget:'eco',ratio2to1:false,allergenes:['lait'],digestMin:0},
+];
+
+const CATS=[
+  {key:'boisson',label:'💧 Boisson'},
+  {key:'gel',label:'⚡ Gel'},
+  {key:'gel_caf',label:'☕ Gel Caféine'},
+  {key:'gommes',label:'🍬 Gommes'},
+  {key:'solide',label:'🍫 Solide'},
+  {key:'naturel',label:'🍌 Naturel'},
+  {key:'recup',label:'🔄 Récupération'},
+];
+
+const ZONES=[
+  {l:1,name:'Z1 Récup',gluc:20,hyd:260,sod:330,color:'#4DA6FF'},
+  {l:2,name:'Z2 Endurance',gluc:45,hyd:420,sod:560,color:'#3DD68C'},
+  {l:3,name:'Z3 Tempo',gluc:60,hyd:580,sod:720,color:'#FFB800'},
+  {l:4,name:'Z4 Seuil',gluc:75,hyd:700,sod:880,color:'#FF7A47'},
+  {l:5,name:'Z5 VO2max',gluc:90,hyd:820,sod:1060,color:'#FF4D4D'},
+];
+
+const NIVEAUX={
+  debutant:     {label:'Débutant',sub:'< 1 an · loisir',range:'30–60g/h',mult:.75,gt:false},
+  intermediaire:{label:'Intermédiaire',sub:'1–3 ans · amateur',range:'50–80g/h',mult:1.0,gt:false},
+  confirme:     {label:'Confirmé',sub:'3–5 ans · compétitions',range:'70–90g/h',mult:1.15,gt:true},
+  elite:        {label:'Élite / Gut',sub:'5 ans+ · haut niveau',range:'90–120g/h',mult:1.35,gt:true},
+};
+
+const OBJECTIFS=[
+  {key:'performance',label:'🏆 Performance / Compétition',sub:'Maximiser l\'énergie — rien ne doit manquer'},
+  {key:'endurance',label:'📈 Sortie longue endurance',sub:'Économiser le glycogène, digestion priority'},
+  {key:'perte_poids',label:'⚖️ Perte de poids',sub:'Déficit contrôlé, glucides réduits'},
+  {key:'gut_training',label:'🔬 Gut Training',sub:'Entraîner l\'intestin à absorber plus'},
+  {key:'recuperation',label:'🛌 Récupération active',sub:'Effort léger, recharge glycogène'},
+];
+
+const SPORT_LABEL={velo:'🚴 Vélo',trail:'🏔 Trail',course:'🏃 Course',triathlon:'🏊 Triathlon'};
+const SPORT_TIP={
+  velo:'Sur le vélo tu peux bien digérer les solides. Profites-en en début de sortie, puis passe aux gels.',
+  trail:'La course impact rend les solides difficiles. Gels et purées naturelles sont tes alliés.',
+  course:'Limite les solides à l\'effort. Gels isotoniques et boissons légères sont la base.',
+  triathlon:'Charge à vélo, gels liquides sur le run. Évite les solides lourds en partie course.',
+};
+
+function getRep(sport,h){
+  const base={
+    velo:     {br:.45,gr:.25,sr:.30},
+    trail:    {br:.40,gr:.50,sr:.10},
+    course:   {br:.45,gr:.50,sr:.05},
+    triathlon:{br:.45,gr:.35,sr:.20},
+  }[sport]||{br:.45,gr:.25,sr:.30};
+  if(h<1.0)return{...base,sr:Math.max(base.sr-.15,0),gr:base.gr+.15};
+  if(h>4.0)return{...base,sr:Math.min(base.sr+.10,.40),gr:Math.max(base.gr-.10,.15)};
+  return base;
+}
+
+const STACKS={
+  eco:{label:'💚 Budget',desc:'Décathlon + DIY — efficace et économique',slots:{boisson1:'apt_bois',boisson2:null,gel1:'apt_gel',gel2:null,gelb1:'apt_caf',gelb2:null,solide1:'pain_epices',solide2:null,recup1:'apt_recup'}},
+  mid:{label:'🔥 Équilibré',desc:'Meilleur compromis qualité/prix',slots:{boisson1:'tailwind',boisson2:null,gel1:'go_iso',gel2:'pf30',gelb1:'overstims_caf',gelb2:null,solide1:'apt_barre',solide2:null,recup1:'sis_recup'}},
+  prem:{label:'👑 Premium',desc:'Configuration niveau pro',slots:{boisson1:'maurten160',boisson2:'c30',gel1:'pf30',gel2:'gel100',gelb1:'gel100caf',gelb2:null,solide1:'veloforte',solide2:null,recup1:'maurten_mix_recup'}},
+  nat:{label:'🌿 Naturel',desc:'100% naturel et DIY',slots:{boisson1:'diy_miel',boisson2:null,gel1:'huma',gel2:'diy_gel',gelb1:'clif_caf',gelb2:null,solide1:'rice_cake',solide2:'banane',recup1:'skyr_banane'}},
+};
+
+/* ════════════════════════════════════
+   STATE
+════════════════════════════════════ */
+const DB_DATE='Juin 2025';
+
+const SAISON_OBJECTIFS=[
+  {key:'loisir',ico:'🛤',label:'Loisir / Santé',sub:'Pas d\'objectif compétitif'},
+  {key:'premiere_course',ico:'🎯',label:'Première course',sub:'Découvrir la compétition'},
+  {key:'chrono',ico:'⏱',label:'Objectif chronométrique',sub:'PB, qualification, podium'},
+  {key:'ultra',ico:'🏔',label:'Ultra / Long Distance',sub:'Trail de + de 50km, Ironman…'},
+  {key:'saison',ico:'📅',label:'Saison complète',sub:'Plusieurs courses sur l\'année'},
+];
+
+let S={
+  step:1,nSteps:5,splashDone:false,
+  expressMode:false,
+  express:{sport:'velo',duree:120,niveau:'intermediaire'},
+  profil:{poids:72,age:30,sexe:'H',sport:'velo',tolerance:'normale',niveau:'intermediaire',saisonObj:'loisir'},
+  sortie:{duree:120,intensite:3,temp:18,humidite:60,objectif:'performance',distanceKm:0,denivPos:0},
+  slots:{boisson1:null,boisson2:null,gel1:null,gel2:null,gelb1:null,gelb2:null,solide1:null,solide2:null,recup1:null},
+  budget:'mid',
+  modal:null,mSearch:'',mCat:'all',
+  resTab:'resume',
+  weatherLoading:false,
+  firstLoad3:true,
+  savedPlans:[],
+  installDismissed:false,
+};
+
+function save(){
+  try{
+    const d={
+      profil:S.profil,sortie:S.sortie,budget:S.budget,splashDone:true,
+      savedPlans:S.savedPlans,
+      slots:Object.fromEntries(Object.entries(S.slots).map(([k,v])=>[k,v?v.id:null])),
+    };
+    localStorage.setItem('ff4',JSON.stringify(d));
+    showToast('✓ Sauvegardé');
+  }catch(e){}
+}
+
+function load(){
+  try{
+    const d=JSON.parse(localStorage.getItem('ff4')||'{}');
+    if(d.profil)S.profil={...S.profil,...d.profil};
+    if(d.sortie)S.sortie={...S.sortie,...d.sortie};
+    if(d.budget)S.budget=d.budget;
+    if(d.splashDone)S.splashDone=true;
+    if(d.savedPlans)S.savedPlans=d.savedPlans;
+    if(d.slots){
+      Object.entries(d.slots).forEach(([k,id])=>{S.slots[k]=id?P.find(p=>p.id===id)||null:null;});
+      if(Object.values(S.slots).some(Boolean))S.firstLoad3=false;
+    }
+  }catch(e){}
+}
+
+let toastTimer=null;
+function showToast(msg='✓ Sauvegardé'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2000);
+}
+
+/* ════════════════════════════════════
+   CALCUL — METs Ainsworth 2011
+════════════════════════════════════ */
+function calc(){
+  const{poids,sexe,sport,niveau,tolerance}=S.profil;
+  const{duree,intensite,temp,humidite,objectif,distanceKm,denivPos}=S.sortie;
+  const zone=ZONES[intensite-1];
+  const nv=NIVEAUX[niveau]||NIVEAUX.intermediaire;
+  const h=duree/60;
+
+  // Calories (METs validés)
+  const met=(METS[sport]||METS.velo)[intensite-1];
+  const sexF=sexe==='F'?.92:1.0;
+  // Bonus D+ trail
+  const denivBonus=denivPos>0?(denivPos/1000)*80:0;
+  const calories=Math.round(met*poids*h*sexF+denivBonus);
+
+  // Hydratation
+  const tempB=temp>32?350:temp>26?180:temp>20?60:-80;
+  const humB=humidite>78?130:humidite>62?55:0;
+  const hydrat=Math.round(h*(zone.hyd+tempB+humB));
+
+  // Sodium
+  const sodM=temp>30?1.65:temp>24?1.3:1.0;
+  const sodium=Math.round(h*zone.sod*sodM);
+
+  // Glucides/h
+  let gH=zone.gluc*nv.mult;
+  if(objectif==='perte_poids')gH=Math.min(gH,40);
+  if(objectif==='recuperation')gH=Math.min(gH,35);
+  if(objectif==='gut_training'&&nv.gt)gH=Math.min(gH*1.25,120);
+  if(objectif==='performance')gH*=1.05;
+  if(h<0.75)gH=Math.min(gH,25);
+  if(h>3.5)gH=Math.min(gH+10,120);
+  gH=Math.round(Math.min(gH,120));
+  const gTotal=Math.round(gH*h);
+
+  // Répartition
+  const rep=getRep(sport,h);
+  const cible={boisson:Math.round(gTotal*rep.br),gel:Math.round(gTotal*rep.gr),solide:Math.round(gTotal*rep.sr)};
+
+  function sc(k1,k2,target){
+    const p1=S.slots[k1],p2=S.slots[k2];
+    let q1=0,q2=0;
+    if(p1&&p1.gluc>0)q1=Math.max(0,Math.round(target/p1.gluc));
+    const rem=Math.max(0,target-q1*(p1?p1.gluc:0));
+    if(p2&&p2.gluc>0)q2=p1?Math.max(0,Math.round(rem/p2.gluc)):Math.max(0,Math.round(target/p2.gluc));
+    return{q1,q2,gluc:q1*(p1?p1.gluc:0)+q2*(p2?p2.gluc:0),sod:q1*(p1?p1.sod:0)+q2*(p2?p2.sod:0),prix:q1*(p1?p1.prix:0)+q2*(p2?p2.prix:0)};
+  }
+  function gc(){
+    const ga1=S.slots.gel1,ga2=S.slots.gel2,gb1=S.slots.gelb1,gb2=S.slots.gelb2;
+    const tg=cible.gel;
+    let qA1=0,qA2=0,qB1=0,qB2=0;
+    if(ga1&&ga1.gluc>0)qA1=Math.max(0,Math.round(tg*.75/ga1.gluc));
+    const rA=Math.max(0,tg*.75-qA1*(ga1?ga1.gluc:0));
+    if(ga2&&ga2.gluc>0)qA2=ga1?Math.max(0,Math.round(rA/ga2.gluc)):Math.max(0,Math.round(tg*.75/ga2.gluc));
+    const cafQ=Math.max(0,tg*.25);
+    if(gb1&&gb1.gluc>0)qB1=Math.min(Math.max(0,Math.round(cafQ/gb1.gluc)),2);
+    const rB2=Math.max(0,cafQ-qB1*(gb1?gb1.gluc:0));
+    if(gb2&&gb2.gluc>0)qB2=Math.min(Math.max(0,Math.round(rB2/gb2.gluc)),2);
+    return{qA1,qA2,qB1,qB2,
+      glucA:qA1*(ga1?ga1.gluc:0)+qA2*(ga2?ga2.gluc:0),glucB:qB1*(gb1?gb1.gluc:0)+qB2*(gb2?gb2.gluc:0),
+      sodA:qA1*(ga1?ga1.sod:0)+qA2*(ga2?ga2.sod:0),sodB:qB1*(gb1?gb1.sod:0)+qB2*(gb2?gb2.sod:0),
+      prixA:qA1*(ga1?ga1.prix:0)+qA2*(ga2?ga2.prix:0),prixB:qB1*(gb1?gb1.prix:0)+qB2*(gb2?gb2.prix:0)};
+  }
+
+  const br=sc('boisson1','boisson2',cible.boisson);
+  const sr=sc('solide1','solide2',cible.solide);
+  const gr=gc();
+  const gReel=br.gluc+sr.gluc+gr.glucA+gr.glucB;
+  const sodTotal=br.sod+sr.sod+gr.sodA+gr.sodB;
+  const cout=+(br.prix+sr.prix+gr.prixA+gr.prixB).toFixed(2);
+
+  // BCAA signalement > 3h
+  const bcaaNeeded=h>=3;
+
+  // Récupération
+  const recov={eau:+(poids*.15+.5).toFixed(1),prot:Math.round(poids*.3),gluc:Math.round(poids*1.0),sod:Math.round(sodium*.6)};
+
+  // Progression hebdomadaire
+  const progTips=buildProgression(gH,nv);
+
+  return{zone,nv,calories,hydrat,sodium,gH,gTotal,cible,rep,br,sr,gr,gReel,sodTotal,cout,recov,bcaaNeeded,progTips};
+}
+
+/* ════════════════════════════════════
+   PROGRESSION HEBDOMADAIRE
+════════════════════════════════════ */
+function buildProgression(glucH,nv){
+  const next1=Math.min(glucH+5,120);
+  const next2=Math.min(glucH+12,120);
+  const next3=Math.min(glucH+20,120);
+  return[
+    {week:'Semaine actuelle',gluc:glucH,type:'current',tip:'Maintiens ce protocole — note ta tolérance digestive'},
+    {week:'Semaine +1',gluc:next1,type:'next',tip:`Augmente de 5g/h — ${next1}g/h — si semaine actuelle bien tolérée`},
+    {week:'Semaine +2/+3',gluc:next2,type:'future',tip:`Objectif ${next2}g/h — gut training progressif`},
+    nv.gt?{week:'Objectif long terme',gluc:next3,type:'future',tip:`${next3}g/h — niveau élite avec 4-6 semaines de gut training`}:null,
+  ].filter(Boolean);
+}
+
+/* ════════════════════════════════════
+   TIMELINE
+════════════════════════════════════ */
+function buildTimeline(){
+  const c=calc();
+  const{duree,intensite}=S.sortie;
+  const{sport}=S.profil;
+  const events=[];
+
+  function fmt(min){
+    if(min<=0)return'Départ';if(min>=duree)return'Arrivée';
+    const h=Math.floor(min/60),m=min%60;
+    return h>0?(m>0?`${h}h${String(m).padStart(2,'0')}`:`${h}h00`):`${min}min`;
+  }
+
+  const gelSlots=[S.slots.gel1,S.slots.gel2].filter(Boolean);
+  const solSlots=[S.slots.solide1,S.slots.solide2].filter(Boolean);
+  const bSlot=S.slots.boisson1||S.slots.boisson2;
+  const cafSlot=S.slots.gelb1||S.slots.gelb2;
+  const cafMin=Math.max(duree-45,Math.round(duree*.72));
+  const freq=c.zone.l<=2?30:c.zone.l===3?25:20;
+
+  events.push({min:0,type:'drink',key:true,what:'Départ',detail:bSlot?`${bSlot.name} — bidon prêt en main`:'Bidon d\'eau en main',note:'Commence à boire dès le départ — ne pas attendre la soif',gluc:0});
+
+  let gelIdx=0,solideDone=false,t=Math.min(20,Math.round(freq*.6));
+  while(t<duree-10){
+    const isCaf=cafSlot&&t>=cafMin&&t<cafMin+freq;
+    if(isCaf){
+      events.push({min:t,type:'caf',key:true,what:'Gel caféine',detail:`${cafSlot.name} · ${cafSlot.brand}`,note:`Effet en ${cafSlot.digestMin||10}–20min · Boost final`,gluc:cafSlot.gluc});
+    }else if(!solideDone&&solSlots.length>0&&(intensite<=3||t<25)&&sport!=='course'){
+      const s=solSlots[0];
+      events.push({min:t,type:'eat',key:false,what:'Solide',detail:`${s.name} · ${s.brand}`,note:`Digestion ~${s.digestMin||35}min · Prends avec de l'eau`,gluc:s.gluc});
+      solideDone=true;
+    }else if(gelSlots.length>0){
+      const g=gelSlots[gelIdx%gelSlots.length];
+      events.push({min:t,type:'gel',key:false,what:'Gel',detail:`${g.name} · ${g.brand}`,note:`Effet en ${g.digestMin||10}–15min${g.ratio2to1?' · Ratio 2:1 ✓':''}`,gluc:g.gluc});
+      gelIdx++;
+    }
+    if(bSlot&&t%30===0){
+      const bml=Math.round(500/(duree/30));
+      events.push({min:t+5,type:'drink',key:false,what:'Boisson',detail:`${bSlot.name} — ~${bml}ml`,note:'Hydratation régulière, petites gorgées',gluc:0});
+    }
+    t+=freq;
+  }
+  events.push({min:duree,type:'finish',key:true,what:'Arrivée 🏁',detail:'Fenêtre anabolique 30min max',note:`${S.slots.recup1?S.slots.recup1.name+' · '+S.slots.recup1.brand:'Boisson de récupération + protéines'}`,gluc:0});
+
+  events.sort((a,b)=>a.min-b.min);
+  const clean=[];
+  events.forEach(e=>{const l=clean[clean.length-1];if(!l||Math.abs(e.min-l.min)>=7)clean.push(e);});
+  return clean.map(e=>`
+    <div class="tl-ev">
+      <div class="tl-time ${e.key?'key':''}">${fmt(e.min)}</div>
+      <div class="tl-dot ${e.type}"></div>
+      <div class="tl-card">
+        <div class="tl-what" style="color:${e.type==='eat'?'var(--orange)':e.type==='drink'?'var(--blue)':e.type==='gel'?'var(--green)':e.type==='caf'?'var(--purple)':'var(--teal)'}">
+          ${e.what}${e.gluc>0?`<span class="tl-gluc" style="color:var(--orange)">${e.gluc}g</span>`:''}
+        </div>
+        <div class="tl-detail">${e.detail}</div>
+        ${e.note?`<div class="tl-digest">${e.note}</div>`:''}
+      </div>
+    </div>`).join('');
+}
+
+/* ════════════════════════════════════
+   RENDER ENGINE
+════════════════════════════════════ */
+function render(){renderPills();renderStep();renderNav();}
+
+function renderPills(){
+  let h='';
+  for(let i=1;i<=S.nSteps;i++)h+=`<div class="pill ${i===S.step?'active':i<S.step?'done':'todo'}"></div>`;
+  document.getElementById('pills').innerHTML=h;
+}
+
+function renderNav(){
+  let h='';
+  if(S.step>1)h+=`<button class="btn bsec" onclick="prevStep()" style="flex:1">← RETOUR</button>`;
+  if(S.step<S.nSteps)h+=`<button class="btn bprim" onclick="nextStep()" style="flex:${S.step===1?4:2}">SUIVANT →</button>`;
+  if(S.step===S.nSteps)h+=`<button class="btn bsec" onclick="printPlan()" style="flex:1">🖨</button><button class="btn bprim" onclick="restart()" style="flex:2">↺ NOUVEAU PLAN</button>`;
+  document.getElementById('bnav').innerHTML=h;
+}
+
+function renderStep(){
+  let h='';
+  for(let i=1;i<=S.nSteps;i++)h+=`<div class="step ${i===S.step?'active':''}">${getContent(i)}</div>`;
+  document.getElementById('steps').innerHTML=h;
+  renderModal();
+}
+function getContent(n){
+  if(n===1)return s1();if(n===2)return s2();if(n===3)return s3();if(n===4)return s4();if(n===5)return s5();return'';
+}
+
+/* ─── STEP 1 : PROFIL ─── */
+function s1(){
+  const{poids,age,sexe,sport,tolerance,niveau}=S.profil;
+  return`
+  <div class="stitle">PROFIL</div>
+  <div class="ssub">Données sauvegardées automatiquement</div>
+  <div class="card">
+    <div class="row">
+      <div class="f"><label class="lbl">Poids (kg)</label>
+        <input type="number" value="${poids}" min="30" max="200" onchange="upP('poids',+this.value);vP()">
+        <div class="ferr" id="fw_p">Entre 30 et 200 kg</div></div>
+      <div class="f"><label class="lbl">Âge</label>
+        <input type="number" value="${age}" min="10" max="90" onchange="upP('age',+this.value);vP()">
+        <div class="ferr" id="fw_a">Entre 10 et 90 ans</div></div>
+    </div>
+    <div class="row">
+      <div class="f"><label class="lbl">Sexe biologique</label>
+        <select onchange="upP('sexe',this.value)">
+          <option value="H" ${sexe==='H'?'selected':''}>Homme</option>
+          <option value="F" ${sexe==='F'?'selected':''}>Femme</option>
+        </select></div>
+    </div>
+    <div class="f" style="margin-bottom:9px"><label class="lbl">Sport principal</label>
+      <div class="seg">${['velo','trail','course','triathlon'].map(s=>`<button class="${sport===s?'on':''}" onclick="upP('sport','${s}')">${SPORT_LABEL[s]}</button>`).join('')}</div>
+    </div>
+    <div class="f"><label class="lbl">Tolérance digestive</label>
+      <div class="seg">
+        <button class="${tolerance==='sensible'?'on':''}" onclick="upP('tolerance','sensible')">🏥 Sensible</button>
+        <button class="${tolerance==='normale'?'on':''}" onclick="upP('tolerance','normale')">👍 Normale</button>
+        <button class="${tolerance==='robuste'?'on':''}" onclick="upP('tolerance','robuste')">💪 Robuste</button>
+      </div></div>
+  </div>
+  <label class="lbl" style="padding:0 2px 5px;display:block">NIVEAU DE PRATIQUE</label>
+  <div class="ngrid">
+    ${Object.entries(NIVEAUX).map(([k,v])=>`
+      <div class="nlevel ${niveau===k?'on':''}" onclick="upP('niveau','${k}')">
+        <div class="ntitle">${v.label}</div><div class="nsub">${v.sub}</div><div class="nrange">${v.range}</div>
+      </div>`).join('')}
+  </div>
+  <div class="tip"><div class="tipico">💡</div><div>${SPORT_TIP[sport]||''}</div></div>
+  <label class="lbl" style="padding:0 2px 5px;display:block;margin-top:4px">OBJECTIF DE LA SAISON</label>
+  <div class="season-btns">
+    ${SAISON_OBJECTIFS.map(o=>`
+      <div class="season-item ${S.profil.saisonObj===o.key?'on':''}" onclick="upP('saisonObj','${o.key}')">
+        <div class="season-ico">${o.ico}</div>
+        <div><div style="font-weight:600">${o.label}</div><div style="font-size:10px;color:var(--mu)">${o.sub}</div></div>
+      </div>`).join('')}
+  </div>
+  <div style="height:6px"></div>`;
+}
+
+/* ─── STEP 2 : SORTIE ─── */
+function s2(){
+  const{duree,intensite,temp,humidite,objectif,distanceKm,denivPos}=S.sortie;
+  const zone=ZONES[intensite-1];
+  const dH=Math.floor(duree/60),dM=duree%60;
+  const isTrail=S.profil.sport==='trail';
+  return`
+  <div class="stitle">LA SORTIE</div>
+  <div class="ssub">Paramètres et objectif de séance</div>
+  <button class="wbtn ${S.weatherLoading?'loading':''}" onclick="fetchWeather()">
+    ${S.weatherLoading?'⏳ Localisation…':'🌤 Météo automatique (GPS)'}
+  </button>
+  <div class="card">
+    <div class="f" style="margin-bottom:13px">
+      <label class="lbl">Durée</label>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
+        <span class="rval">${duree}<span style="font-size:11px;color:var(--mu);font-family:var(--fs)"> min</span></span>
+        <span style="font-size:11px;color:var(--mu)">${dH>0?dH+'h':''}${dM>0?String(dM).padStart(2,'0')+'min':''}</span>
+      </div>
+      <input type="range" min="20" max="480" step="5" value="${duree}" oninput="upS('duree',+this.value)">
+      <div class="rlabels"><span>20min</span><span>2h</span><span>4h</span><span>8h</span></div>
+    </div>
+    <div class="f" style="margin-bottom:13px">
+      <label class="lbl">Zone d'intensité</label>
+      <input type="range" min="1" max="5" step="1" value="${intensite}" oninput="upS('intensite',+this.value)"
+        style="background:linear-gradient(to right,${zone.color} ${(intensite-1)*25}%,var(--b1) ${(intensite-1)*25}%)">
+      <div class="rlabels"><span>Z1 Récup</span><span>Z2</span><span>Z3</span><span>Z4</span><span>Z5 VO2</span></div>
+      <div style="margin-top:7px"><span class="zbadge" style="background:${zone.color}18;color:${zone.color};border:1px solid ${zone.color}28">${zone.name} — ~${zone.gluc}g/h base</span></div>
+    </div>
+    <div class="f" style="margin-bottom:13px">
+      <label class="lbl">Température</label>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
+        <span class="rval">${temp}<span style="font-size:11px;color:var(--mu);font-family:var(--fs)">°C</span></span>
+        ${temp>30?'<span style="font-size:10px;color:var(--red)">⚠ Chaleur · sodium augmenté</span>':temp<3?'<span style="font-size:10px;color:var(--blue)">🥶 Froid</span>':''}
+      </div>
+      <input type="range" min="-5" max="45" step="1" value="${temp}" oninput="upS('temp',+this.value)">
+      <div class="rlabels"><span>-5°</span><span>15°</span><span>30°</span><span>45°</span></div>
+    </div>
+    <div class="f" style="margin-bottom:${isTrail?13:0}px">
+      <label class="lbl">Humidité — ${humidite}%</label>
+      <input type="range" min="0" max="100" step="5" value="${humidite}" oninput="upS('humidite',+this.value)">
+      <div class="rlabels"><span>Sec 0%</span><span>Modéré</span><span>Tropical 100%</span></div>
+    </div>
+    ${isTrail?`
+    <div class="divider"></div>
+    <div style="font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:500">Données Trail</div>
+    <div class="trail-extra">
+      <div class="te-card">
+        <label class="lbl">Distance (km)</label>
+        <input type="number" value="${distanceKm}" min="0" max="300" onchange="upS('distanceKm',+this.value)" placeholder="0">
+      </div>
+      <div class="te-card">
+        <label class="lbl">D+ (m)</label>
+        <input type="number" value="${denivPos}" min="0" max="10000" onchange="upS('denivPos',+this.value)" placeholder="0">
+      </div>
+    </div>
+    ${denivPos>500?`<div class="tip" style="margin-bottom:0"><div class="tipico">⛰</div><div>+${denivPos}m de D+ augmente les calories brûlées d'environ ${Math.round(denivPos/1000*80)} kcal.</div></div>`:''}
+    `:''}
+  </div>
+  <label class="lbl" style="padding:0 2px 5px;display:block">OBJECTIF DE LA SÉANCE</label>
+  <div class="objlist">
+    ${OBJECTIFS.map(o=>`
+      <div class="objitem ${objectif===o.key?'on':''}" onclick="upS('objectif','${o.key}')">
+        <div class="obj-ico">${o.label.split(' ')[0]}</div>
+        <div><div class="otitle">${o.label.split(' ').slice(1).join(' ')}</div><div class="osub">${o.sub}</div></div>
+      </div>`).join('')}
+  </div>
+  ${temp>30||humidite>75?`<div class="abox aw">💧 Conditions chaudes/humides — hydratation et sodium automatiquement augmentés.</div>`:''}
+  <div style="height:6px"></div>`;
+}
+
+/* ─── STEP 3 : PRODUITS ─── */
+function s3(){
+  if(S.firstLoad3){
+    S.firstLoad3=false;
+    const stack=STACKS[S.budget]||STACKS.mid;
+    Object.entries(stack.slots).forEach(([k,id])=>{S.slots[k]=id?P.find(p=>p.id===id)||null:null;});
+  }
+  const c=calc();
+  const pct=c.gTotal>0?Math.min(100,Math.round(c.gReel/c.gTotal*100)):0;
+  const bCol=pct>=85&&pct<=115?'var(--green)':pct>115?'var(--yellow)':'var(--orange)';
+
+  // Alerte fructose
+  let frucHtml='';
+  if(c.gH>60){
+    const goodProd=P.filter(p=>p.ratio2to1&&(p.cat==='boisson'||p.cat==='gel')).slice(0,4);
+    frucHtml=`<div class="fruc">
+      <div class="fruc-t">⚠️ Ratio Fructose:Glucose requis à ${c.gH}g/h</div>
+      <div class="fruc-b">Au-delà de <strong>60g/h</strong>, l'intestin sature le transporteur SGLT1 (glucose). Il faut des produits utilisant GLUT5 (fructose) en ratio <strong>2:1 Maltodextrine:Fructose</strong> pour éviter nausées et crampes.<br><span style="color:var(--green);margin-top:3px;display:block">✓ Produits compatibles :</span></div>
+      <div class="fruc-p">${goodProd.map(p=>`<span class="fruc-tag">${p.name} · ${p.brand}</span>`).join('')}</div>
+    </div>`;
+  }
+
+  // Alerte BCAA > 3h
+  let bcaaHtml='';
+  if(c.bcaaNeeded){
+    bcaaHtml=`<div class="abox ap">🔬 Effort > 3h : à partir de la 3ème heure, les acides aminés (BCAA) deviennent une source d'énergie. Privilégie des produits contenant des BCAA : GU Roctane, SiS Beta Fuel, ou 5-10g de BCAA en poudre dans la boisson.</div>`;
+  }
+
+  function slot(k,p,idx){
+    if(!p)return`<button class="eslot" onclick="openModal('${k}')"><div class="eplus">+</div><div style="font-size:10px">Ajouter</div></button>`;
+    return`<div class="pslot filled" onclick="openModal('${k}')">
+      <div class="slbl">Slot ${idx}</div><div class="sname">${p.name}</div>
+      <div class="sbrand">${p.brand}</div><div class="sval">${p.gluc}g · ${p.prix}€</div>
+      <button class="sdel" onclick="event.stopPropagation();clearSlot('${k}')">×</button>
+    </div>`;
+  }
+  function sec(ico,lbl,cib,k1,k2){
+    return`<div class="psec">
+      <div class="pshead"><span>${ico}</span><span>${lbl}</span><span style="margin-left:auto;color:var(--orange);font-weight:700">${cib}g</span></div>
+      <div class="psgrid">${slot(k1,S.slots[k1],1)}${slot(k2,S.slots[k2],2)}</div>
+    </div>`;
+  }
+  function secRecup(ico,lbl,k){
+    const p=S.slots[k];
+    if(!p)return`<div class="psec">
+      <div class="pshead"><span>${ico}</span><span>${lbl}</span></div>
+      <div class="psgrid"><button class="eslot" onclick="openModal('${k}')"><div class="eplus">+</div><div style="font-size:10px">Ajouter</div></button><div></div></div>
+    </div>`;
+    return`<div class="psec">
+      <div class="pshead"><span>${ico}</span><span>${lbl}</span></div>
+      <div class="psgrid"><div class="pslot filled" onclick="openModal('${k}')">
+        <div class="slbl">Post-effort</div><div class="sname">${p.name}</div>
+        <div class="sbrand">${p.brand}</div><div class="sval">${p.gluc}g gluc · ${p.prix}€</div>
+        <button class="sdel" onclick="event.stopPropagation();clearSlot('${k}')">×</button>
+      </div><div></div></div>
+    </div>`;
+  }
+
+  const stack=STACKS[S.budget];
+  return`
+  <div class="stitle">PRODUITS</div>
+  <div class="ssub">Sélection auto ou manuelle · <span style="color:var(--mu)">Base mise à jour ${DB_DATE}</span></div>
+  ${frucHtml}${bcaaHtml}
+  <div class="reco">
+    <div class="reco-t">⚡ Stack recommandé</div>
+    <div class="reco-d">${stack.label} — ${stack.desc}</div>
+    <div class="budgbtns">
+      ${['eco','mid','prem','nat'].map(b=>`<button class="bdbtn ${S.budget===b?'on':''}" onclick="setBudget('${b}')">${b==='eco'?'💚 Budget':b==='mid'?'🔥 Équilibré':b==='prem'?'👑 Premium':'🌿 Naturel'}</button>`).join('')}
+    </div>
+    <button class="reco-apply" onclick="applyStack()">→ APPLIQUER CE STACK</button>
+  </div>
+  <div class="totbar">
+    <div class="ti"><div class="tn" style="color:var(--orange)">${c.gTotal}g</div><div class="tl">Cible</div></div>
+    <div class="ti"><div class="tn" style="color:${bCol}">${c.gReel}g</div><div class="tl">Apport</div></div>
+    <div class="ti"><div class="tn" style="color:var(--blue)">${c.cout}€</div><div class="tl">Coût</div></div>
+    <div class="ti"><div class="tn" style="color:var(--yellow)">${c.gH}g/h</div><div class="tl">Obj/h</div></div>
+  </div>
+  <div class="glucbar">
+    <div class="glucbar-h"><span>GLUCIDES APPORTÉS</span><span style="color:${bCol};font-weight:600">${pct}%</span></div>
+    <div class="glucbar-t">
+      <div class="glucbar-f" style="width:${pct}%;background:${bCol}"></div>
+      <div class="glucbar-line" style="left:88%"></div>
+    </div>
+    <div style="font-size:9px;color:var(--mu);margin-top:2px;display:flex;justify-content:space-between"><span>0%</span><span>↑ Cible 88–115%</span></div>
+  </div>
+  <div class="card">
+    ${sec('💧','Boisson',c.cible.boisson,'boisson1','boisson2')}
+    ${sec('⚡','Gel standard',c.cible.gel,'gel1','gel2')}
+    ${sec('☕','Gel caféine',Math.round(c.cible.gel*.25),'gelb1','gelb2')}
+    ${sec('🍫','Solide / Barre',c.cible.solide,'solide1','solide2')}
+    <div class="divider"></div>
+    ${secRecup('🔄','Récupération post-effort','recup1')}
+  </div>
+  <div class="tip"><div class="tipico">💡</div><div style="font-size:11px">Gel caféiné dans les <strong>30-45 dernières minutes</strong>. Inutile sur sortie &lt; 90min.</div></div>
+  <div style="height:6px"></div>`;
+}
+
+/* ─── STEP 4 : TIMELINE ─── */
+function s4(){
+  const c=calc();
+  const hasP=Object.values(S.slots).some(Boolean);
+  return`
+  <div class="stitle">TIMELINE</div>
+  <div class="ssub">Plan de ravitaillement · timing de digestion inclus</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:11px">
+    <div class="sc2"><div class="sn2" style="color:var(--orange)">${c.gH}g/h</div><div class="sl2">Gluc/h</div></div>
+    <div class="sc2"><div class="sn2" style="color:var(--blue)">${Math.round(S.sortie.duree/60*500)}ml</div><div class="sl2">Hydrat.</div></div>
+    <div class="sc2"><div class="sn2" style="color:var(--green)">${c.cout}€</div><div class="sl2">Coût</div></div>
+  </div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:10px;color:var(--mu);margin-bottom:11px">
+    ${[['eat','var(--orange)','Solide (lent)'],['drink','var(--blue)','Boisson'],['gel','var(--green)','Gel (rapide)'],['caf','var(--purple)','Caféine']].map(([t,c,l])=>`<span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${c};margin-right:4px;vertical-align:middle"></span>${l}</span>`).join('')}
+  </div>
+  ${!hasP?`<div class="abox ai">ℹ️ Aucun produit sélectionné — timeline générique. Retourne à l'étape 3.</div>`:''}
+  <div class="timeline">
+    <div class="tl-ev">
+      <div class="tl-time key">J-3h</div>
+      <div class="tl-dot info"></div>
+      <div class="tl-card">
+        <div class="tl-what" style="color:var(--mu)">Repas pré-sortie</div>
+        <div class="tl-detail">Glucides complexes + 500ml eau · Riz, pâtes, pain, banane</div>
+        <div class="tl-digest">Digestion 2-3h · Évite les fibres, graisses, alcool</div>
+      </div>
+    </div>
+    ${buildTimeline()}
+  </div>
+  <div class="slabel">RÉCUPÉRATION POST-EFFORT</div>
+  <div class="recov-grid">
+    <div class="recov-item"><div class="recov-n" style="color:var(--blue)">${c.recov.eau}L</div><div class="recov-l">Eau</div><div class="recov-s">Priorité absolue</div></div>
+    <div class="recov-item"><div class="recov-n" style="color:var(--orange)">${c.recov.gluc}g</div><div class="recov-l">Glucides</div><div class="recov-s">Dans les 30min</div></div>
+    <div class="recov-item"><div class="recov-n" style="color:var(--green)">${c.recov.prot}g</div><div class="recov-l">Protéines</div><div class="recov-s">Réparation musc.</div></div>
+  </div>
+  ${S.slots.recup1?`<div class="card" style="margin-bottom:9px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="font-size:22px">🔄</div>
+      <div><div style="font-weight:600;font-size:13px">${S.slots.recup1.name}</div>
+      <div style="font-size:11px;color:var(--mu)">${S.slots.recup1.brand} · ${S.slots.recup1.gluc}g gluc · ${S.slots.recup1.prix}€</div>
+      ${S.slots.recup1.note?`<div style="font-size:10px;color:var(--t2);margin-top:2px">${S.slots.recup1.note}</div>`:''}
+      </div>
+    </div>
+  </div>`:''}
+  <div style="height:6px"></div>`;
+}
+
+/* ─── STEP 5 : RÉSULTATS ─── */
+function s5(){
+  const c=calc();
+  const{zone,calories,hydrat,sodium,gH,gTotal,cible,br,sr,gr,gReel,sodTotal,cout,recov,bcaaNeeded,progTips}=c;
+  const{intensite,temp}=S.sortie;
+  const{tolerance,sport,niveau}=S.profil;
+  const nv=NIVEAUX[niveau];
+
+  function cr(ico,nm,cib,reel,sod,prix){
+    if(reel===0&&cib===0)return'';
+    const e=reel-cib,pct=cib>0?Math.min(100,Math.round(reel/cib*100)):0;
+    let sc='ok',st='✓ OK',pc='pok';
+    if(reel===0&&cib>0){sc='def';st='Vide';pc='pdef';}
+    else if(e<-10){sc='def';st=`-${Math.abs(e)}g`;pc='pdef';}
+    else if(e>20){sc='ov';st=`+${e}g`;pc='pov';}
+    return`<div class="catres">
+      <div class="crh"><div class="crn">${ico} ${nm}</div><div class="crs ${sc}">${st}</div></div>
+      <div class="pbar"><div class="pfill ${pc}" style="width:${pct}%"></div></div>
+      <div class="crd"><span>${reel}g / ${cib}g</span><span>${sod}mg sel · ${prix.toFixed(1)}€</span></div>
+    </div>`;
+  }
+
+  let alertes='';
+  if(sodTotal<sodium*.6)alertes+=`<div class="abox aw">🧂 Sodium insuffisant (${sodTotal}mg/${sodium}mg). Ajoute Nduranz, Precision Hydration ou bretzels.</div>`;
+  if(intensite>=4&&(S.slots.solide1||S.slots.solide2))alertes+=`<div class="abox aw">⚠️ Intensité Z4/Z5 : solides uniquement avant le départ ou dans les 20 premières minutes.</div>`;
+  if(tolerance==='sensible')alertes+=`<div class="abox ai">🏥 Estomac sensible : SiS GO Isotonic, Maurten Hydrogel et Huma Gel sont conçus pour minimiser les irritations.</div>`;
+  if(gReel>=gTotal*.88&&gReel<=gTotal*1.15)alertes+=`<div class="abox ag">✅ Plan glucidique parfaitement calibré !</div>`;
+  if(cout<5)alertes+=`<div class="abox ag">💚 Budget maîtrisé — séance à moins de 5€.</div>`;
+  if(bcaaNeeded)alertes+=`<div class="abox ap">🔬 Effort > 3h : les BCAA deviennent une source d'énergie. Privilégie GU Roctane, SiS Beta Fuel, ou ajoute 5g BCAA dans ta boisson.</div>`;
+  if(sport==='trail'&&S.sortie.duree>180)alertes+=`<div class="abox ap">🏔 Ultra trail : intègre des aliments salés (bretzels, noix) après 3h pour maintenir l'appétence.</div>`;
+  if(S.sortie.objectif==='gut_training')alertes+=`<div class="abox ap">🔬 Gut Training actif : augmente de 5g/h par semaine. Surveille ta tolérance digestive à chaque séance.</div>`;
+
+  function gi(k,qty,unit){
+    const p=S.slots[k];if(!p||qty===0)return'';
+    return`<div class="gear">
+      <div><div style="font-weight:600">${p.name} <span style="font-size:10px;color:var(--mu)">${p.brand}</span></div>
+      <div class="ginfo">${p.gluc}g gluc · ${p.sod}mg sel · ${p.prix}€/u${p.allergenes&&p.allergenes.length?` · ⚠ ${p.allergenes.join(', ')}`:''}</div></div>
+      <div class="gqty">${qty}<small> ${unit}</small></div>
+    </div>`;
+  }
+
+  const hasG=Object.values(S.slots).some(Boolean);
+  const bidons=Math.max(1,Math.ceil(hydrat/500));
+
+  const resumePanel=`
+    ${buildScoreRing(c)}
+    <div class="hero">
+      <div class="heronum">${gTotal}g</div>
+      <div class="herolbl">GLUCIDES CIBLE — ${gH}g / HEURE</div>
+      <div class="herorow">
+        <div><div class="hstat-n" style="color:var(--yellow)">${calories}</div><div class="hstat-l">kcal</div></div>
+        <div><div class="hstat-n" style="color:var(--blue)">${hydrat}ml</div><div class="hstat-l">hydrat.</div></div>
+        <div><div class="hstat-n" style="color:var(--teal)">${sodium}mg</div><div class="hstat-l">sodium</div></div>
+        <div><div class="hstat-n" style="color:var(--green)">${cout}€</div><div class="hstat-l">coût</div></div>
+      </div>
+    </div>
+    <div class="slabel">BILAN GLUCIDIQUE</div>
+    ${cr('💧','Boisson',cible.boisson,br.gluc,br.sod,br.prix)}
+    ${cr('⚡','Gels',cible.gel,gr.glucA+gr.glucB,gr.sodA+gr.sodB,gr.prixA+gr.prixB)}
+    ${cr('🍫','Solide',cible.solide,sr.gluc,sr.sod,sr.prix)}
+    ${alertes?`<div class="slabel">ALERTES</div>${alertes}`:''}
+    <div class="nutr-bars" style="margin-top:4px">
+      <div class="nbar"><span class="nbar-lbl">Glucides</span><div class="nbar-track"><div class="nbar-fill" style="width:${Math.min(100,Math.round(gReel/gTotal*100))||0}%;background:var(--orange)"></div></div><span style="font-size:10px;color:var(--mu);min-width:30px;text-align:right">${Math.min(100,Math.round(gReel/gTotal*100))||0}%</span></div>
+      <div class="nbar"><span class="nbar-lbl">Sodium</span><div class="nbar-track"><div class="nbar-fill" style="width:${Math.min(100,Math.round(sodTotal/sodium*100))||0}%;background:var(--teal)"></div></div><span style="font-size:10px;color:var(--mu);min-width:30px;text-align:right">${Math.min(100,Math.round(sodTotal/sodium*100))||0}%</span></div>
+      <div class="nbar"><span class="nbar-lbl">Récupération</span><div class="nbar-track"><div class="nbar-fill" style="width:${S.slots.recup1?100:0}%;background:var(--purple)"></div></div><span style="font-size:10px;color:var(--mu);min-width:30px;text-align:right">${S.slots.recup1?'✓':'–'}</span></div>
+    </div>`;
+  const materielPanel=`
+    <div class="slabel">À EMPORTER</div>
+    <div class="card">
+      <div class="gear"><div><div style="font-weight:600">💧 Eau / Bidons</div><div class="ginfo">${hydrat}ml total estimé</div></div><div class="gqty">${bidons}<small> bidon${bidons>1?'s':''}</small></div></div>
+      ${gi('boisson1',br.q1,'bidon')}${gi('boisson2',br.q2,'bidon')}
+      ${gi('gel1',gr.qA1,'gel')}${gi('gel2',gr.qA2,'gel')}
+      ${gi('gelb1',gr.qB1,'gel')}${gi('gelb2',gr.qB2,'gel')}
+      ${gi('solide1',sr.q1,'unité')}${gi('solide2',sr.q2,'unité')}
+      ${!hasG?'<div class="empty"><div class="eico">📋</div>Aucun produit sélectionné</div>':''}
+    </div>
+    <div class="slabel">RÉCUPÉRATION</div>
+    <div class="card">
+      <div class="gear"><div><div style="font-weight:600">🥛 Fenêtre anabolique</div><div class="ginfo">Dans les 30min après l'arrivée — priorité absolue</div></div><div style="font-size:11px;color:var(--t2);text-align:right">${recov.prot}g protéines<br>${recov.gluc}g glucides</div></div>
+      <div class="gear"><div><div style="font-weight:600">💧 Réhydratation</div><div class="ginfo">1.5× le poids perdu en eau</div></div><div style="font-size:11px;color:var(--t2);text-align:right">${recov.eau}L eau<br>${recov.sod}mg sel</div></div>
+      ${S.slots.recup1?`<div class="gear" style="border:none"><div><div style="font-weight:600">${S.slots.recup1.name}</div><div class="ginfo">${S.slots.recup1.brand} · ${S.slots.recup1.gluc}g gluc</div></div><div class="gqty">1<small> dose</small></div></div>`:'<div class="gear" style="border:none;padding:9px 0 0"><div style="color:var(--mu);font-size:12px">Ajoute un produit de récupération à l\'étape 3 → slot Récupération</div></div>'}
+    </div>`;
+
+  const progressionPanel=`
+    <div class="slabel">PLAN PROGRESSIF</div>
+    <div class="tip"><div class="tipico">📈</div><div style="font-size:11px">Le gut training (entraînement intestinal) permet d'augmenter progressivement ta capacité d'absorption. Voici ta feuille de route :</div></div>
+    <div class="prog-week">
+      ${progTips.map(w=>`
+        <div class="pw-item">
+          <div class="pw-badge ${w.type==='current'?'pw-current':w.type==='next'?'pw-next':'pw-future'}">${w.gluc}g/h</div>
+          <div class="pw-body">
+            <div class="pw-title">${w.week}</div>
+            <div class="pw-sub">${w.tip}</div>
+          </div>
+        </div>`).join('')}
+    </div>
+    <div class="slabel">PARTAGER & SAUVEGARDER</div>
+    <div class="share-panel">
+      <div class="share-title">TON PLAN</div>
+      <div class="share-btns">
+        <button class="sbtn" onclick="copyPlanText()"><div class="sico">📋</div>Copier le résumé</button>
+        <button class="sbtn" onclick="savePlan()"><div class="sico">💾</div>Sauvegarder le plan</button>
+        <button class="sbtn" onclick="printPlan()"><div class="sico">🖨</div>Imprimer</button>
+        <button class="sbtn" onclick="shareNative()"><div class="sico">↗</div>Partager</button>
+      </div>
+    </div>`;
+
+  return`
+  <div class="stitle">TON PLAN</div>
+  <div class="ssub">${S.sortie.duree}min · ${zone.name} · ${S.sortie.temp}°C · ${nv.label}</div>
+  <div class="restabs">
+    <button class="restab ${S.resTab==='resume'?'on':''}" onclick="setTab('resume')">📊 Résumé</button>
+    <button class="restab ${S.resTab==='materiel'?'on':''}" onclick="setTab('materiel')">🎒 Matériel</button>
+    <button class="restab ${S.resTab==='progression'?'on':''}" onclick="setTab('progression')">📈 Progression</button>
+  </div>
+  <div class="respanel ${S.resTab==='resume'?'active':''}">${resumePanel}</div>
+  <div class="respanel ${S.resTab==='materiel'?'active':''}">${materielPanel}</div>
+  <div class="respanel ${S.resTab==='progression'?'active':''}">${progressionPanel}</div>
+  <div class="footnote">FuelForce 4.1 · Calories basées sur Ainsworth METs 2011 · Glucides selon Jeukendrup 2010<br>Base produits mise à jour ${DB_DATE} · Données indicatives · Consulte un nutritionniste du sport pour un protocole compétition</div>`;
+}
+
+/* ════════════════════════════════════
+   MODAL PRODUITS
+════════════════════════════════════ */
+function renderModal(){
+  const ex=document.getElementById('mBg');if(ex)ex.remove();
+  if(!S.modal)return;
+  const cm={boisson1:'boisson',boisson2:'boisson',gel1:'gel',gel2:'gel',gelb1:'gel_caf',gelb2:'gel_caf',solide1:'solide',solide2:'solide',recup1:'recup'};
+  if(S.mCat==='all'&&cm[S.modal])S.mCat=cm[S.modal];
+  const fCat=S.mCat==='all'?null:S.mCat;
+  const q=S.mSearch.toLowerCase();
+  const prods=P.filter(p=>(!fCat||p.cat===fCat)&&(!q||p.name.toLowerCase().includes(q)||p.brand.toLowerCase().includes(q)||p.note.toLowerCase().includes(q)));
+  const labels={boisson1:'💧 Boisson 1',boisson2:'💧 Boisson 2',gel1:'⚡ Gel 1',gel2:'⚡ Gel 2',gelb1:'☕ Caféine 1',gelb2:'☕ Caféine 2',solide1:'🍫 Solide 1',solide2:'🍫 Solide 2',recup1:'🔄 Récupération'};
+
+  function ptags(p){
+    let t='';
+    if(p.tags.includes('nat'))t+=`<span class="tag tnat">Naturel</span>`;
+    if(p.tags.includes('diy'))t+=`<span class="tag tdiy">DIY</span>`;
+    if(p.tags.includes('caf'))t+=`<span class="tag tcaf">Caféine</span>`;
+    if(p.tags.includes('elite'))t+=`<span class="tag telite">Élite</span>`;
+    if(p.budget==='eco')t+=`<span class="tag teco">€ Budget</span>`;
+    if(p.budget==='prem')t+=`<span class="tag tprem">Premium</span>`;
+    if(p.ratio2to1)t+=`<span class="tag" style="background:var(--gd);color:var(--green)">2:1 ✓</span>`;
+    if(p.tags.includes('recov'))t+=`<span class="tag trecov">Récup</span>`;
+    return t;
+  }
+
+  const list=prods.map(p=>`
+    <div class="pitem" onclick="selectProd('${p.id}')">
+      <div class="pl">
+        <div class="pname">${p.name}</div>
+        <div class="pbrand">${p.brand}</div>
+        <div class="pnote">${p.note}</div>
+        ${p.allergenes&&p.allergenes.length?`<div class="pallerg">⚠ ${p.allergenes.join(' · ')}</div>`:''}
+        <div class="ptags">${ptags(p)}</div>
+        ${p.url?`<a class="buy-link" href="${p.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">🛒 Voir le produit</a>`:''}
+      </div>
+      <div class="pr">
+        <div class="pgluc">${p.gluc}<small>g</small></div>
+        <div class="pprix">${p.prix}€</div>
+        ${p.ratio2to1?`<div class="pratio">2:1</div>`:''}
+      </div>
+    </div>`).join('');
+
+  document.body.insertAdjacentHTML('beforeend',`
+    <div class="modal-bg" id="mBg" onclick="if(event.target.id==='mBg')closeModal()">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-hdr">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div class="mtitle">${labels[S.modal]||S.modal}</div>
+            <button onclick="closeModal()" style="background:none;border:none;color:var(--mu);font-size:25px;cursor:pointer;padding:0 3px;line-height:1">×</button>
+          </div>
+          <input class="msearch" placeholder="🔍 Produit, marque, ingrédient…" value="${S.mSearch}" oninput="setMS(this.value)" autofocus>
+          <div class="catbar">
+            <button class="catbtn ${S.mCat==='all'?'on':''}" onclick="setMC('all')">Tous</button>
+            ${CATS.map(c=>`<button class="catbtn ${S.mCat===c.key?'on':''}" onclick="setMC('${c.key}')">${c.label}</button>`).join('')}
+          </div>
+        </div>
+        <div class="modal-scroll">
+          ${list||'<div class="empty"><div class="eico">🔍</div>Aucun résultat</div>'}
+        </div>
+      </div>
+    </div>`);
+}
+
+/* ════════════════════════════════════
+   PLANS SAUVEGARDÉS — PANEL
+════════════════════════════════════ */
+function showPlans(){
+  const ex=document.getElementById('plansBg');if(ex){ex.remove();return;}
+  const icons={velo:'🚴',trail:'🏔',course:'🏃',triathlon:'🏊'};
+  const listHtml=S.savedPlans.length===0
+    ?'<div class="empty"><div class="eico">💾</div>Aucun plan sauvegardé</div>'
+    :S.savedPlans.map((pl,i)=>`
+      <div class="plan-item">
+        <div class="plan-ico">${icons[pl.sport]||'🏃'}</div>
+        <div style="flex:1" onclick="loadPlan(${i})">
+          <div class="plan-name">${pl.name}</div>
+          <div class="plan-meta">${pl.sport} · ${pl.duree}min · ${pl.niveau} · ${pl.glucH}g/h · ${pl.date}</div>
+        </div>
+        <button class="plan-del" onclick="deletePlan(${i})">×</button>
+      </div>`).join('');
+
+  document.body.insertAdjacentHTML('beforeend',`
+    <div class="modal-bg" id="plansBg" onclick="if(event.target.id==='plansBg')closePlans()">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-hdr">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <div class="mtitle">📋 MES PLANS</div>
+            <button onclick="closePlans()" style="background:none;border:none;color:var(--mu);font-size:25px;cursor:pointer;padding:0 3px;line-height:1">×</button>
+          </div>
+          <div style="font-size:11px;color:var(--mu)">Sauvegarde et compare tes plans course</div>
+        </div>
+        <div class="modal-scroll">
+          <div class="plans-panel" style="margin-top:10px">
+            ${listHtml}
+            <button class="save-plan-btn" onclick="savePlan()">+ Sauvegarder le plan actuel</button>
+          </div>
+        </div>
+      </div>
+    </div>`);
+}
+
+function closePlans(){const e=document.getElementById('plansBg');if(e)e.remove();}
+
+function savePlan(){
+  const c=calc();
+  const name=prompt('Nom du plan (ex: Marathon Paris, Sortie Col du Galibier…)','Plan '+(S.savedPlans.length+1));
+  if(!name)return;
+  const now=new Date();
+  S.savedPlans.unshift({
+    name,
+    sport:S.profil.sport,duree:S.sortie.duree,niveau:S.profil.niveau,
+    glucH:c.gH,intensite:S.sortie.intensite,temp:S.sortie.temp,
+    budget:S.budget,cout:c.cout,
+    date:now.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'}),
+    profil:{...S.profil},sortie:{...S.sortie},
+    slots:Object.fromEntries(Object.entries(S.slots).map(([k,v])=>[k,v?v.id:null])),
+  });
+  if(S.savedPlans.length>10)S.savedPlans=S.savedPlans.slice(0,10);
+  save();closePlans();
+  showToast('💾 Plan sauvegardé !');
+}
+
+function loadPlan(i){
+  const pl=S.savedPlans[i];if(!pl)return;
+  S.profil={...S.profil,...pl.profil};
+  S.sortie={...S.sortie,...pl.sortie};
+  S.budget=pl.budget;
+  if(pl.slots)Object.entries(pl.slots).forEach(([k,id])=>{S.slots[k]=id?P.find(p=>p.id===id)||null:null;});
+  S.firstLoad3=false;
+  closePlans();save();S.step=1;render();
+  showToast('✓ Plan chargé');
+}
+
+function deletePlan(i){
+  S.savedPlans.splice(i,1);save();closePlans();
+  setTimeout(()=>showPlans(),100);
+}
+
+/* ════════════════════════════════════
+   EXPORT / PARTAGE
+════════════════════════════════════ */
+function buildPlanText(){
+  const c=calc();
+  const nv=NIVEAUX[S.profil.niveau];
+  const zone=ZONES[S.sortie.intensite-1];
+  let txt=`🔥 FUELFORCE 4.0 — MON PLAN NUTRITION\n`;
+  txt+=`${'─'.repeat(36)}\n`;
+  txt+=`📋 ${S.sortie.duree}min · ${zone.name} · ${S.sortie.temp}°C · ${SPORT_LABEL[S.profil.sport]} · ${nv.label}\n\n`;
+  txt+=`🎯 GLUCIDES : ${c.gTotal}g (${c.gH}g/h)\n`;
+  txt+=`💧 HYDRATATION : ${c.hydrat}ml\n`;
+  txt+=`🧂 SODIUM : ${c.sodium}mg\n`;
+  txt+=`🔥 CALORIES : ${c.calories}kcal\n`;
+  txt+=`💰 COÛT : ${c.cout}€\n\n`;
+  txt+=`📦 PRODUITS :\n`;
+  Object.entries(S.slots).forEach(([k,p])=>{if(p)txt+=`  • ${p.name} (${p.brand}) — ${p.gluc}g/u\n`;});
+  txt+=`\n⏱ PROTOCOLE :\n`;
+  txt+=`  • J-3h : Repas glucidique\n`;
+  txt+=`  • Départ : Bidon + 1er produit à 20min\n`;
+  txt+=`  • Toutes les ${ZONES[S.sortie.intensite-1].l<=2?30:25}min : Gel ou boisson\n`;
+  txt+=`  • -40min : Gel caféine si dispo\n`;
+  txt+=`  • Arrivée : Récupération dans les 30min\n\n`;
+  txt+=`Créé avec FuelForce 4.0 — nutrition sport calibrée`;
+  return txt;
+}
+
+async function copyPlanText(){
+  try{await navigator.clipboard.writeText(buildPlanText());showToast('📋 Copié !');}
+  catch(e){alert(buildPlanText());}
+}
+
+async function shareNative(){
+  if(navigator.share){
+    try{await navigator.share({title:'Mon plan nutrition FuelForce',text:buildPlanText()});return;}catch(e){}
+  }
+  copyPlanText();
+}
+
+function printPlan(){
+  S.step=5;S.resTab='materiel';render();
+  setTimeout(()=>{window.print();},300);
+}
+
+/* ════════════════════════════════════
+   ACTIONS
+════════════════════════════════════ */
+function upP(k,v){S.profil[k]=v;save();renderStep();}
+function upS(k,v){S.sortie[k]=v;save();renderStep();}
+function setTab(t){S.resTab=t;renderStep();}
+function openModal(k){S.modal=k;S.mSearch='';const m={boisson1:'boisson',boisson2:'boisson',gel1:'gel',gel2:'gel',gelb1:'gel_caf',gelb2:'gel_caf',solide1:'solide',solide2:'solide',recup1:'recup'};S.mCat=m[k]||'all';renderModal();}
+function closeModal(){S.modal=null;S.mSearch='';renderModal();}
+function setMC(c){S.mCat=c;renderModal();}
+function setMS(v){S.mSearch=v;renderModal();}
+
+function selectProd(id){
+  const p=P.find(x=>x.id===id);
+  if(p&&S.modal)S.slots[S.modal]=p;
+  const k=S.modal;S.modal=null;S.mSearch='';
+  save();renderStep();renderModal();
+  setTimeout(()=>{const el=document.querySelector(`.pslot.filled`);if(el)el.classList.add('flash');},50);
+}
+
+function clearSlot(k){S.slots[k]=null;save();renderStep();}
+
+function setBudget(b){
+  S.budget=b;
+  const stack=STACKS[b];
+  if(stack)Object.entries(stack.slots).forEach(([k,id])=>{S.slots[k]=id?P.find(p=>p.id===id)||null:null;});
+  save();renderStep();
+}
+function applyStack(){setBudget(S.budget);}
+
+function vP(){
+  const{poids,age}=S.profil;
+  const pw=document.getElementById('fw_p'),aw=document.getElementById('fw_a');
+  if(pw)pw.classList.toggle('show',poids<30||poids>200);
+  if(aw)aw.classList.toggle('show',age<10||age>90);
+  return!(poids<30||poids>200||age<10||age>90);
+}
+
+function nextStep(){
+  if(S.step===1&&!vP())return;
+  if(S.step<S.nSteps){S.step++;render();window.scrollTo(0,0);}
+}
+function prevStep(){if(S.step>1){S.step--;render();window.scrollTo(0,0);}}
+function restart(){S.step=1;S.slots={boisson1:null,boisson2:null,gel1:null,gel2:null,gelb1:null,gelb2:null,solide1:null,solide2:null,recup1:null};S.firstLoad3=true;render();window.scrollTo(0,0);}
+
+async function fetchWeather(){
+  if(S.weatherLoading)return;
+  if(!navigator.geolocation){alert('Géolocalisation non disponible.\nSaisis la température manuellement via le slider.');return;}
+  S.weatherLoading=true;renderStep();
+  const geo=new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{timeout:7000,maximumAge:300000}));
+  try{
+    const pos=await Promise.race([geo,new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),8000))]);
+    const{latitude:lat,longitude:lon}=pos.coords;
+    const resp=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(2)}&longitude=${lon.toFixed(2)}&current_weather=true`);
+    const data=await resp.json();
+    S.sortie.temp=Math.round(data.current_weather.temperature);
+    S.weatherLoading=false;save();renderStep();showToast('🌤 Météo récupérée');
+  }catch(e){
+    S.weatherLoading=false;
+    const ios=/Safari/i.test(navigator.userAgent)&&!/Chrome/i.test(navigator.userAgent);
+    alert(ios
+      ?'📍 Sur Safari iOS :\nRéglages → Confidentialité → Services de localisation → Safari → "Lors de l\'utilisation"\n\nOu ajuste la température manuellement.'
+      :'Localisation impossible. Vérifie les permissions de ton navigateur.\n\nOu ajuste la température manuellement avec le slider.');
+    renderStep();
+  }
+}
+
+function startApp(){
+  const sp=document.getElementById('splash');
+  sp.classList.add('out');
+  setTimeout(()=>{sp.style.display='none';document.getElementById('app').style.display='block';S.splashDone=true;save();checkInstall();},400);
+}
+
+/* ══ EXPRESS MODE ══════════════════════════════ */
+function startExpress(){
+  document.getElementById('splash').style.display='none';
+  renderExpress();
+  document.getElementById('expressOverlay').style.display='flex';
+}
+
+function renderExpress(){
+  const el=document.getElementById('expressOverlay');
+  const{sport,duree,niveau}=S.express;
+  const sports=[{k:'velo',i:'🚴',l:'Vélo'},{k:'trail',i:'🏔',l:'Trail'},{k:'course',i:'🏃',l:'Course'},{k:'triathlon',i:'🏊',l:'Triathlon'}];
+  const durees=[{v:60,l:'1h'},{v:90,l:'1h30'},{v:120,l:'2h'},{v:180,l:'3h'},{v:240,l:'4h'},{v:360,l:'6h'}];
+  const niveaux=[{k:'debutant',l:'Débutant'},{k:'intermediaire',l:'Intermédiaire'},{k:'confirme',l:'Confirmé'},{k:'elite',l:'Élite'}];
+  el.innerHTML=`
+    <div class="expr-logo">FUEL<span>FORCE</span> <span style="font-size:12px;color:var(--mu)">MODE EXPRESS</span></div>
+    <div class="expr-title">3 QUESTIONS</div>
+    <div class="expr-sub">Ton plan complet en 30 secondes</div>
+    <div class="expr-q">1. Ton sport</div>
+    <div class="expr-opts">
+      ${sports.map(s=>`<div class="expr-opt ${sport===s.k?'on':''}" onclick="S.express.sport='${s.k}';renderExpress()">
+        <div class="eo-ico">${s.i}</div><div class="eo-lbl">${s.l}</div>
+      </div>`).join('')}
+    </div>
+    <div class="expr-q">2. Durée prévue</div>
+    <div class="expr-opts" style="grid-template-columns:repeat(3,1fr)">
+      ${durees.map(d=>`<div class="expr-opt ${duree===d.v?'on':''}" onclick="S.express.duree=${d.v};renderExpress()">
+        <div class="eo-lbl">${d.l}</div>
+      </div>`).join('')}
+    </div>
+    <div class="expr-q">3. Ton niveau</div>
+    <div class="expr-opts">
+      ${niveaux.map(n=>`<div class="expr-opt ${niveau===n.k?'on':''}" onclick="S.express.niveau='${n.k}';renderExpress()">
+        <div class="eo-lbl">${n.l}</div>
+      </div>`).join('')}
+    </div>
+    <button class="expr-cta" onclick="launchExpress()">→ VOIR MON PLAN</button>
+    <button class="expr-back" onclick="closeExpress()">← Retour au menu complet</button>`;
+}
+
+function launchExpress(){
+  const{sport,duree,niveau}=S.express;
+  S.profil.sport=sport;S.profil.niveau=niveau;
+  S.sortie.duree=duree;
+  // Intensité par défaut Z2 pour express
+  S.sortie.intensite=2;
+  // Appliquer stack équilibré auto
+  S.firstLoad3=true;S.budget='mid';
+  const el=document.getElementById('expressOverlay');
+  el.classList.add('out');
+  setTimeout(()=>{
+    el.style.display='none';el.classList.remove('out');
+    document.getElementById('app').style.display='block';
+    S.splashDone=true;S.step=3;S.expressMode=true;
+    save();render();
+  },350);
+}
+
+function closeExpress(){
+  document.getElementById('expressOverlay').style.display='none';
+  document.getElementById('splash').style.display='flex';
+}
+
+/* ══ SCORE GLOBAL ══════════════════════════════ */
+function buildScoreRing(c){
+  const{gReel,gTotal,sodTotal,sodium,cout}=c;
+  // Score 0-100 basé sur 3 critères
+  let score=0;
+  const glucPct=gTotal>0?gReel/gTotal:0;
+  if(glucPct>=0.88&&glucPct<=1.15)score+=50;
+  else if(glucPct>=0.70&&glucPct<=1.30)score+=25;
+  const sodPct=sodium>0?sodTotal/sodium:0;
+  if(sodPct>=0.60)score+=30;
+  else if(sodPct>=0.40)score+=15;
+  const hasRecup=!!S.slots.recup1;
+  if(hasRecup)score+=20;
+  score=Math.min(100,score);
+  const col=score>=80?'var(--green)':score>=55?'var(--yellow)':'var(--orange)';
+  const lbl=score>=80?'Optimal':score>=55?'Bon':'À améliorer';
+  const r=44,circ=2*Math.PI*r,offset=circ*(1-score/100);
+  return`<div class="score-ring-wrap">
+    <svg class="score-ring" width="110" height="110" viewBox="0 0 110 110">
+      <circle class="score-ring-bg" cx="55" cy="55" r="${r}"/>
+      <circle class="score-ring-fill" cx="55" cy="55" r="${r}"
+        stroke="${col}" stroke-dasharray="${circ.toFixed(1)}"
+        stroke-dashoffset="${offset.toFixed(1)}" style="stroke-dashoffset:${offset.toFixed(1)}"/>
+    </svg>
+    <div class="score-center"><div class="score-num" style="color:${col}">${score}</div><div class="score-lbl">${lbl}</div></div>
+  </div>`;
+}
+
+/* ══ OBJECTIF DE SAISON dans S1 ═══════════════ */
+// Injecté dans s1() via patch
+
+/* ══ LIENS D'ACHAT dans modal ════════════════ */
+function buyLink(p){
+  if(!p.url)return'';
+  return`<a class="buy-link" href="${p.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">🛒 Acheter</a>`;
+}
+
+/* ══ PWA INSTALL ══════════════════════════════ */
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();deferredPrompt=e;
+  if(!S.installDismissed)document.getElementById('installBanner').style.display='flex';
+});
+
+function installPWA(){
+  if(!deferredPrompt)return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(()=>{deferredPrompt=null;dismissInstall();});
+}
+
+function dismissInstall(){
+  document.getElementById('installBanner').style.display='none';
+  S.installDismissed=true;save();
+}
+
+function checkInstall(){
+  if(deferredPrompt&&!S.installDismissed)
+    setTimeout(()=>document.getElementById('installBanner').style.display='flex',3000);
+}
+
+// Inject PWA manifest dynamically
+(function(){
+  const manifest={name:'FuelForce',short_name:'FuelForce',description:'Plan nutrition sport scientifique',start_url:'./',display:'standalone',background_color:'#090909',theme_color:'#090909',icons:[{src:'data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' rx=\'20\' fill=\'%23090909\'/><text y=\'75\' x=\'10\' font-size=\'70\' font-family=\'Arial Black\' fill=\'%23FF5A1F\'>FF</text></svg>',sizes:'192x192',type:'image/svg+xml'}]};
+  const blob=new Blob([JSON.stringify(manifest)],{type:'application/json'});
+  document.getElementById('pwa-manifest').href=URL.createObjectURL(blob);
+})();
+
+/* ════════════════════════════════════
+   INIT
+════════════════════════════════════ */
+load();
+if(S.splashDone){document.getElementById('splash').style.display='none';document.getElementById('app').style.display='block';checkInstall();}
+render();
+</script>
+</body>
+</html>
