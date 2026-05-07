@@ -434,7 +434,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:21px;heigh
     <div class="sp-feat"><div class="sp-ico">💾</div><div class="sp-txt"><strong>Plans sauvegardés</strong><span>Crée et compare plusieurs plans course</span></div></div>
     <div class="sp-feat"><div class="sp-ico">🛒</div><div class="sp-txt"><strong>95+ produits référencés</strong><span>Tous budgets · Allergènes · Ratio 2:1</span></div></div>
   </div>
-  <button class="sp-cta" onclick="startApp()">CRÉER MON PLAN →</button>
+  <button class="sp-cta" onclick="startApp()">DÉMARRER MON PLAN →</button>
   <button style="width:100%;max-width:310px;padding:11px;background:transparent;border:1px solid var(--b1);border-radius:11px;font-family:var(--fs);font-size:13px;color:var(--t2);cursor:pointer;margin-top:8px;transition:all .2s" onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='var(--b1)'" onclick="startExpress()">⚡ Mode Express — résultat en 30 secondes</button>
   <div class="sp-note">Gratuit · Sans inscription · Données 100% locales</div>
 </div>
@@ -658,9 +658,9 @@ function getRep(sport,h){
 }
 
 const STACKS={
-  eco:{label:'💚 Budget',desc:'Décathlon + DIY — efficace et économique',slots:{boisson1:'apt_bois',boisson2:null,gel1:'apt_gel',gel2:null,gelb1:'apt_caf',gelb2:null,solide1:'pain_epices',solide2:null,recup1:'apt_recup'}},
+  eco:{label:'💚 Budget',desc:'Décathlon + DIY — efficace et économique',slots:{boisson1:'diy_citron',boisson2:null,gel1:'apt_gel',gel2:null,gelb1:'apt_caf',gelb2:null,solide1:'pain_epices',solide2:null,recup1:'apt_recup'}},
   mid:{label:'🔥 Équilibré',desc:'Meilleur compromis qualité/prix',slots:{boisson1:'tailwind',boisson2:null,gel1:'go_iso',gel2:'pf30',gelb1:'overstims_caf',gelb2:null,solide1:'apt_barre',solide2:null,recup1:'sis_recup'}},
-  prem:{label:'👑 Premium',desc:'Configuration niveau pro',slots:{boisson1:'maurten160',boisson2:'c30',gel1:'pf30',gel2:'gel100',gelb1:'gel100caf',gelb2:null,solide1:'veloforte',solide2:null,recup1:'maurten_mix_recup'}},
+  prem:{label:'👑 Premium',desc:'Configuration niveau pro',slots:{boisson1:'maurten320',boisson2:'c30',gel1:'pf45',gel2:'gel100',gelb1:'gel100caf',gelb2:null,solide1:'veloforte',solide2:null,recup1:'maurten_mix_recup'}},
   nat:{label:'🌿 Naturel',desc:'100% naturel et DIY',slots:{boisson1:'diy_miel',boisson2:null,gel1:'huma',gel2:'diy_gel',gelb1:'clif_caf',gelb2:null,solide1:'rice_cake',solide2:'banane',recup1:'skyr_banane'}},
 };
 
@@ -1087,7 +1087,7 @@ function s3(){
   }
 
   let alertes='';
-  if(sodTotal<sodium*.6)alertes+=`<div class="abox aw">🧂 Sodium insuffisant (${sodTotal}mg/${sodium}mg). Ajoute Nduranz, Precision Hydration ou bretzels.</div>`;
+  if(sodTotal<sodium*.4)alertes+=`<div class="abox aw">🧂 Sodium faible (${sodTotal}mg/${sodium}mg cible). Ajoute des bretzels, Nduranz ou Precision Hydration.</div>`;
   if(intensite>=4&&(S.slots.solide1||S.slots.solide2))alertes+=`<div class="abox aw">⚠️ Intensité Z4/Z5 : solides uniquement avant le départ ou dans les 20 premières minutes.</div>`;
   if(tolerance==='sensible')alertes+=`<div class="abox ai">🏥 Estomac sensible : SiS GO Isotonic, Maurten Hydrogel et Huma Gel sont conçus pour minimiser les irritations.</div>`;
   if(gReel>=gTotal*.88&&gReel<=gTotal*1.15)alertes+=`<div class="abox ag">✅ Plan glucidique parfaitement calibré !</div>`;
@@ -1910,7 +1910,7 @@ function deleteCustomProd(id){
    INIT
 ════════════════════════════════════ */
 load();
-if(S.splashDone){document.getElementById('splash').style.display='none';document.getElementById('app').style.display='block';checkInstall();}
+// Accueil toujours affiché — l'utilisateur choisit de démarrer
 render();
 </script>
 </body>
