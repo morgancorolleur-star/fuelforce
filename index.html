@@ -419,6 +419,30 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:21px;heigh
 .gluc-val{font-family:var(--ff);font-size:18px;color:var(--orange);min-width:52px;text-align:center}
 .gluc-reset{padding:4px 8px;border:1px solid var(--b1);border-radius:6px;background:transparent;color:var(--mu);font-size:10px;cursor:pointer;font-family:var(--fs);transition:all .2s}
 .gluc-reset:hover{border-color:var(--b2);color:var(--text)}
+/* Owned filter — modal produits */
+.mowned-bar{display:flex;align-items:center;gap:8px;margin:6px 0 2px;padding:6px 0;border-bottom:1px solid var(--bd)}
+.mowned-toggle{padding:4px 12px;border-radius:14px;border:1px solid var(--bd);background:none;color:var(--mu);font-size:11px;cursor:pointer;font-family:var(--fs);transition:.2s}
+.mowned-toggle.on{background:var(--green);color:#fff;border-color:var(--green)}
+.own-btn{padding:3px 8px;border-radius:10px;border:1px solid var(--bd);background:none;font-size:10px;cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:var(--fs);transition:.2s}
+.own-btn.owned{background:var(--gd);color:var(--green);border-color:var(--green)}
+/* Liste de courses */
+.shop-section{margin-bottom:16px}
+.shop-section-title{font-size:11px;font-weight:700;color:var(--mu);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px}
+.shop-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd)}
+.shop-item:last-child{border-bottom:none}
+.shop-info{flex:1}
+.shop-name{font-size:13px;font-weight:600}
+.shop-qty{font-size:11px;color:var(--mu);margin-top:2px}
+.shop-got{padding:4px 10px;border-radius:10px;border:1px solid var(--bd);background:none;font-size:10px;cursor:pointer;white-space:nowrap;font-family:var(--fs);transition:.2s}
+.shop-got.owned{background:var(--gd);color:var(--green);border-color:var(--green)}
+/* Checklist pré-course */
+.cl-group{margin-bottom:18px}
+.cl-day{font-size:11px;font-weight:700;color:var(--orange);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--bd)}
+.cl-item{display:flex;align-items:flex-start;gap:10px;padding:7px 0}
+.cl-cb{width:22px;height:22px;min-width:22px;border-radius:6px;border:2px solid var(--bd);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:.2s;font-family:var(--fs)}
+.cl-cb.done{background:var(--green);border-color:var(--green);color:#fff}
+.cl-text{font-size:12px;color:var(--t2);line-height:1.4;padding-top:3px}
+.cl-text.done{text-decoration:line-through;color:var(--mu)}
 </style>
 </head>
 <body>
@@ -677,6 +701,28 @@ const SAISON_OBJECTIFS=[
   {key:'saison',ico:'📅',label:'Saison complète',sub:'Plusieurs courses sur l\'année'},
 ];
 
+const CHECKLIST_SECTIONS=[
+  {day:'J-3 à J-1',items:[
+    {id:'j3_gluc',txt:'Charge glucidique : augmente les glucides complexes (riz, pâtes, pain)'},
+    {id:'j3_sodium',txt:'Saler davantage les repas pour saturer les réserves de sodium'},
+    {id:'j3_nv',txt:'Éviter alcool, aliments inconnus ou à risque digestif'},
+  ]},
+  {day:'Veille',items:[
+    {id:'v_diner',txt:'Dîner léger : glucides simples, peu de fibres (riz blanc, pâtes blanches)'},
+    {id:'v_eau',txt:'Hydratation 2-3L eau + électrolytes dans la journée'},
+    {id:'v_kit',txt:'Préparer et vérifier le kit nutritionnel complet'},
+  ]},
+  {day:'Matin — Jour J',items:[
+    {id:'m_pdej',txt:'Petit-déjeuner 3-4h avant : glucides + 500ml eau'},
+    {id:'m_caf',txt:'Caféine 30-45min avant si habitude (60-90mg)'},
+  ]},
+  {day:'30min avant départ',items:[
+    {id:'a_eau',txt:'300-500ml eau ou boisson isotonique'},
+    {id:'a_gel',txt:'Gel de départ si effort > 90min'},
+    {id:'a_check',txt:'Vérifier l\'accès à tous les produits sur le kit'},
+  ]},
+];
+
 let S={
   step:1,nSteps:3,splashDone:false,
   expressMode:false,
@@ -686,7 +732,9 @@ let S={
   sortie:{duree:120,intensite:3,temp:18,humidite:60,objectif:'performance',distanceKm:0,denivPos:0,glucOverride:null},
   slots:{boisson1:null,boisson2:null,gel1:null,gel2:null,gelb1:null,gelb2:null,solide1:null,solide2:null,recup1:null},
   budget:'mid',
-  modal:null,mSearch:'',mCat:'all',
+  modal:null,mSearch:'',mCat:'all',mOwned:false,
+  ownedProds:[],
+  checklistDone:{},
   resTab:'plan',
   weatherLoading:false,
   savedPlans:[],
@@ -694,16 +742,18 @@ let S={
   installDismissed:false,
 };
 
-function save(){
+function save(quiet=false){
   try{
     const d={
       profil:S.profil,sortie:S.sortie,budget:S.budget,splashDone:true,
       savedPlans:S.savedPlans,
       customProds:S.customProds,
+      ownedProds:S.ownedProds,
+      checklistDone:S.checklistDone,
       slots:Object.fromEntries(Object.entries(S.slots).map(([k,v])=>[k,v?v.id:null])),
     };
     localStorage.setItem('ff4',JSON.stringify(d));
-    showToast('✓ Sauvegardé');
+    if(!quiet)showToast('✓ Sauvegardé');
   }catch(e){}
 }
 
@@ -716,6 +766,8 @@ function load(){
     if(d.splashDone)S.splashDone=true;
     if(d.savedPlans)S.savedPlans=d.savedPlans;
     if(d.customProds)S.customProds=d.customProds;
+    if(d.ownedProds)S.ownedProds=d.ownedProds;
+    if(d.checklistDone)S.checklistDone=d.checklistDone;
     if(d.slots){
       const allProds=[...P,...S.customProds];
       Object.entries(d.slots).forEach(([k,id])=>{S.slots[k]=id?allProds.find(p=>p.id===id)||null:null;});
@@ -1136,6 +1188,7 @@ function s3(){
     </div>`;
 
   const emporterPanel=`
+    <button class="btn bsec" onclick="showShoppingList()" style="margin-bottom:11px;font-size:12px;padding:9px;letter-spacing:0">🛒 Générer la liste de courses</button>
     <div class="slabel">À EMPORTER</div>
     <div class="card">
       <div class="gear"><div><div style="font-weight:600">💧 Eau / Bidons</div><div class="ginfo">${hydrat}ml total estimé</div></div><div class="gqty">${bidons}<small> bidon${bidons>1?'s':''}</small></div></div>
@@ -1213,6 +1266,29 @@ function s3(){
       </div>
     </div>`;
 
+  const isRace=S.sortie.objectif==='performance';
+  if(!isRace&&S.resTab==='race')S.resTab='plan';
+
+  const checkTotal=CHECKLIST_SECTIONS.reduce((n,s)=>n+s.items.length,0);
+  const checkDone=Object.values(S.checklistDone).filter(Boolean).length;
+  const racePanel=`
+    <div class="slabel">CHECKLIST PRÉ-COURSE</div>
+    <div class="tip"><div class="tipico">☑</div><div style="font-size:11px"><strong id="cl-prog-text">${checkDone}/${checkTotal}</strong> tâches complétées — coche au fur et à mesure !</div></div>
+    <div class="card" style="padding:10px 14px">
+      ${CHECKLIST_SECTIONS.map(s=>`
+        <div class="cl-group">
+          <div class="cl-day">${s.day}</div>
+          ${s.items.map(item=>{
+            const isDone=!!S.checklistDone[item.id];
+            return`<div class="cl-item">
+              <button class="cl-cb ${isDone?'done':''}" data-cl="${item.id}" onclick="toggleChecklist('${item.id}')">${isDone?'✓':''}</button>
+              <div class="cl-text ${isDone?'done':''}" data-cl-txt="${item.id}">${item.txt}</div>
+            </div>`;
+          }).join('')}
+        </div>`).join('')}
+    </div>
+    <button class="btn bsec" style="font-size:12px;padding:8px;margin-bottom:10px" onclick="resetChecklist()">↺ Réinitialiser la checklist</button>`;
+
   return`
   <div class="stitle">MON PLAN</div>
   <div class="ssub">${S.sortie.duree}min · ${zone.name} · ${S.sortie.temp}°C · ${nv.label}</div>
@@ -1222,11 +1298,13 @@ function s3(){
     <button class="restab ${S.resTab==='emporter'?'on':''}" onclick="setTab('emporter')">🎒 Emporter</button>
     <button class="restab ${S.resTab==='timeline'?'on':''}" onclick="setTab('timeline')">⏱ Timeline</button>
     <button class="restab ${S.resTab==='progression'?'on':''}" onclick="setTab('progression')">📈 Prog.</button>
+    ${isRace?`<button class="restab ${S.resTab==='race'?'on':''}" onclick="setTab('race')">☑ Course</button>`:''}
   </div>
   <div class="respanel ${S.resTab==='plan'?'active':''}">${planPanel}</div>
   <div class="respanel ${S.resTab==='emporter'?'active':''}">${emporterPanel}</div>
   <div class="respanel ${S.resTab==='timeline'?'active':''}">${timelinePanel}</div>
   <div class="respanel ${S.resTab==='progression'?'active':''}">${progressionPanel}</div>
+  ${isRace?`<div class="respanel ${S.resTab==='race'?'active':''}">${racePanel}</div>`:''}
   <div class="footnote">FuelForce 4.2 · Calories basées sur Ainsworth METs 2011 · Glucides selon Jeukendrup 2010<br>Base produits mise à jour ${DB_DATE} · Données indicatives · Consulte un nutritionniste du sport pour un protocole compétition</div>`;
 }
 
@@ -1243,7 +1321,7 @@ function renderModal(){
   const userAllerg=S.profil.allergenes||[];
   const hasConflict=p=>userAllerg.length>0&&p.allergenes&&p.allergenes.some(a=>userAllerg.includes(a));
   const allProds=[...P,...S.customProds];
-  const prods=allProds.filter(p=>(!fCat||p.cat===fCat)&&(!q||p.name.toLowerCase().includes(q)||p.brand.toLowerCase().includes(q)||(p.note||'').toLowerCase().includes(q)))
+  const prods=allProds.filter(p=>(!fCat||p.cat===fCat)&&(!q||p.name.toLowerCase().includes(q)||p.brand.toLowerCase().includes(q)||(p.note||'').toLowerCase().includes(q))&&(!S.mOwned||S.ownedProds.includes(p.id)))
     .sort((a,b)=>{const ac=hasConflict(a),bc=hasConflict(b);return ac===bc?0:ac?1:-1;});
   const labels={boisson1:'💧 Boisson 1',boisson2:'💧 Boisson 2',gel1:'⚡ Gel 1',gel2:'⚡ Gel 2',gelb1:'☕ Caféine 1',gelb2:'☕ Caféine 2',solide1:'🍫 Solide 1',solide2:'🍫 Solide 2',recup1:'🔄 Récupération'};
 
@@ -1261,8 +1339,9 @@ function renderModal(){
     return t;
   }
 
-  const list=prods.map(p=>`
-    <div class="pitem" onclick="selectProd('${p.id}')">
+  const list=prods.map(p=>{
+    const isOwned=S.ownedProds.includes(p.id);
+    return`<div class="pitem" onclick="selectProd('${p.id}')">
       <div class="pl">
         <div class="pname">${p.name}</div>
         <div class="pbrand">${p.brand}</div>
@@ -1272,12 +1351,14 @@ function renderModal(){
         ${URLS[p.id]?`<a class="buy-link" href="${URLS[p.id]}" target="_blank" rel="noopener" onclick="event.stopPropagation()">🛒 Acheter</a>`:''}
         ${p.custom?`<button style="background:none;border:none;color:var(--mu);cursor:pointer;font-size:10px;padding:2px 0;margin-top:2px" onclick="event.stopPropagation();deleteCustomProd('${p.id}')">🗑 Supprimer</button>`:''}
       </div>
-      <div class="pr">
+      <div class="pr" style="gap:6px">
         <div class="pgluc">${p.gluc}<small>g</small></div>
         <div class="pprix">${p.prix}€</div>
         ${p.ratio2to1?`<div class="pratio">2:1</div>`:''}
+        <button class="own-btn ${isOwned?'owned':''}" data-own="${p.id}" onclick="event.stopPropagation();toggleOwned('${p.id}')">${isOwned?'✓ En stock':'+ En stock'}</button>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 
   document.body.insertAdjacentHTML('beforeend',`
     <div class="modal-bg" id="mBg" onclick="if(event.target.id==='mBg')closeModal()">
@@ -1288,6 +1369,10 @@ function renderModal(){
             <button onclick="closeModal()" style="background:none;border:none;color:var(--mu);font-size:25px;cursor:pointer;padding:0 3px;line-height:1">×</button>
           </div>
           <input class="msearch" placeholder="🔍 Produit, marque, ingrédient…" value="${S.mSearch}" oninput="setMS(this.value)" autofocus>
+          <div class="mowned-bar">
+            <button class="mowned-toggle ${S.mOwned?'on':''}" onclick="setMOwned(${!S.mOwned})">📦 Mes produits</button>
+            <span style="font-size:11px;color:var(--mu)">${S.mOwned?'Affichage filtré sur tes stocks':'Filtre sur ce que tu as déjà'}</span>
+          </div>
           <div class="catbar">
             <button class="catbtn ${S.mCat==='all'?'on':''}" onclick="setMC('all')">Tous</button>
             ${CATS.map(c=>`<button class="catbtn ${S.mCat===c.key?'on':''}" onclick="setMC('${c.key}')">${c.label}</button>`).join('')}
@@ -1904,6 +1989,133 @@ function deleteCustomProd(id){
   Object.keys(S.slots).forEach(k=>{if(S.slots[k]&&S.slots[k].id===id)S.slots[k]=null;});
   save();closeModal();refreshCustPanel();
   showToast('Produit supprimé');
+}
+
+/* ════════════════════════════════════
+   OWNED PRODUCTS
+════════════════════════════════════ */
+function toggleOwned(id){
+  if(S.ownedProds.includes(id)){
+    S.ownedProds=S.ownedProds.filter(x=>x!==id);
+  }else{
+    S.ownedProds.push(id);
+  }
+  const owned=S.ownedProds.includes(id);
+  document.querySelectorAll(`[data-own="${id}"]`).forEach(el=>{
+    el.classList.toggle('owned',owned);
+    el.textContent=owned?'✓ En stock':'+ En stock';
+  });
+  document.querySelectorAll(`[data-shop-own="${id}"]`).forEach(el=>{
+    el.classList.toggle('owned',owned);
+    el.textContent=owned?'✓ En stock':'+ En stock';
+  });
+  if(S.mOwned)renderModal();
+  if(document.getElementById('shopBg'))showShoppingList();
+  save(true);
+}
+
+function setMOwned(v){S.mOwned=v;renderModal();}
+
+/* ════════════════════════════════════
+   LISTE DE COURSES
+════════════════════════════════════ */
+function buildShoppingItems(){
+  const c=calc();
+  const slotData=[
+    {k:'boisson1',qty:c.br.q1,unit:'bidon'},{k:'boisson2',qty:c.br.q2,unit:'bidon'},
+    {k:'gel1',qty:c.gr.qA1,unit:'gel'},{k:'gel2',qty:c.gr.qA2,unit:'gel'},
+    {k:'gelb1',qty:c.gr.qB1,unit:'gel'},{k:'gelb2',qty:c.gr.qB2,unit:'gel'},
+    {k:'solide1',qty:c.sr.q1,unit:'unité'},{k:'solide2',qty:c.sr.q2,unit:'unité'},
+    {k:'recup1',qty:S.slots.recup1?1:0,unit:'dose'},
+  ];
+  const map={};
+  slotData.forEach(({k,qty,unit})=>{
+    const p=S.slots[k];if(!p||qty<=0)return;
+    if(map[p.id]){map[p.id].qty+=qty;}
+    else{map[p.id]={id:p.id,name:p.name,brand:p.brand,qty,unit,owned:S.ownedProds.includes(p.id),url:URLS[p.id]||null};}
+  });
+  return Object.values(map);
+}
+
+function buildShoppingText(){
+  const items=buildShoppingItems();
+  const toBuy=items.filter(x=>!x.owned);
+  const have=items.filter(x=>x.owned);
+  let txt='🛒 LISTE DE COURSES — FUELFORCE\n\n';
+  if(toBuy.length>0){txt+='À ACHETER :\n';toBuy.forEach(x=>{txt+=`• ${x.qty}× ${x.name} (${x.brand})\n`;});}
+  if(have.length>0){txt+='\nJ\'AI DÉJÀ :\n';have.forEach(x=>{txt+=`• ${x.qty}× ${x.name} (${x.brand}) ✓\n`;});}
+  return txt;
+}
+
+function showShoppingList(){
+  const ex=document.getElementById('shopBg');if(ex)ex.remove();
+  const items=buildShoppingItems();
+  if(items.length===0){showToast('Aucun produit dans le plan');return;}
+  const toBuy=items.filter(x=>!x.owned);
+  const have=items.filter(x=>x.owned);
+  function itemHtml(x){
+    return`<div class="shop-item">
+      <div class="shop-info">
+        <div class="shop-name">${x.qty}× ${x.name}</div>
+        <div class="shop-qty">${x.brand}${x.url?` · <a href="${x.url}" target="_blank" rel="noopener" style="color:var(--orange)">🛒 Acheter</a>`:''}</div>
+      </div>
+      <button class="shop-got ${x.owned?'owned':''}" data-shop-own="${x.id}" onclick="toggleOwned('${x.id}')">${x.owned?'✓ En stock':'+ En stock'}</button>
+    </div>`;
+  }
+  const toBuyHtml=toBuy.length>0?`<div class="shop-section"><div class="shop-section-title">À acheter (${toBuy.length})</div>${toBuy.map(itemHtml).join('')}</div>`:'';
+  const haveHtml=have.length>0?`<div class="shop-section"><div class="shop-section-title">J'ai déjà (${have.length})</div>${have.map(itemHtml).join('')}</div>`:
+    `<div class="empty" style="margin-top:6px"><div class="eico">📦</div>Marque ce que tu as déjà avec "+ En stock" !</div>`;
+  document.body.insertAdjacentHTML('beforeend',`
+    <div class="modal-bg" id="shopBg" onclick="if(event.target.id==='shopBg')closeShoppingList()">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-hdr">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <div class="mtitle">🛒 LISTE DE COURSES</div>
+            <button onclick="closeShoppingList()" style="background:none;border:none;color:var(--mu);font-size:25px;cursor:pointer;padding:0 3px;line-height:1">×</button>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="sbtn" style="flex:1" onclick="copyShoppingList()"><div class="sico">📋</div>Copier</button>
+            <button class="sbtn" style="flex:1" onclick="shareShoppingList()"><div class="sico">↗</div>Partager</button>
+          </div>
+        </div>
+        <div class="modal-scroll"><div style="padding:10px 0">${toBuyHtml}${haveHtml}</div></div>
+      </div>
+    </div>`);
+}
+
+function closeShoppingList(){const e=document.getElementById('shopBg');if(e)e.remove();}
+
+function copyShoppingList(){
+  navigator.clipboard.writeText(buildShoppingText()).then(()=>showToast('📋 Copié !')).catch(()=>showToast('⚠ Erreur copie'));
+}
+
+function shareShoppingList(){
+  const txt=buildShoppingText();
+  if(navigator.share){navigator.share({title:'Ma liste de courses FuelForce',text:txt}).catch(()=>{});}
+  else{copyShoppingList();}
+}
+
+/* ════════════════════════════════════
+   CHECKLIST PRÉ-COURSE
+════════════════════════════════════ */
+function toggleChecklist(id){
+  S.checklistDone[id]=!S.checklistDone[id];
+  const isDone=S.checklistDone[id];
+  const btn=document.querySelector(`[data-cl="${id}"]`);
+  const txt=document.querySelector(`[data-cl-txt="${id}"]`);
+  if(btn){btn.classList.toggle('done',isDone);btn.textContent=isDone?'✓':'';}
+  if(txt){txt.classList.toggle('done',isDone);}
+  const total=CHECKLIST_SECTIONS.reduce((n,s)=>n+s.items.length,0);
+  const nDone=Object.values(S.checklistDone).filter(Boolean).length;
+  const prog=document.getElementById('cl-prog-text');
+  if(prog)prog.textContent=`${nDone}/${total}`;
+  save(true);
+}
+
+function resetChecklist(){
+  S.checklistDone={};
+  save(true);
+  renderStep();
 }
 
 /* ════════════════════════════════════
