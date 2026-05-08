@@ -1259,10 +1259,11 @@ function s3(){
     <div class="share-panel">
       <div class="share-title">TON PLAN</div>
       <div class="share-btns">
+        <button class="sbtn" onclick="sharePlanUrl()"><div class="sico">🔗</div>Partager le lien</button>
         <button class="sbtn" onclick="copyPlanText()"><div class="sico">📋</div>Copier le résumé</button>
-        <button class="sbtn" onclick="savePlan()"><div class="sico">💾</div>Sauvegarder le plan</button>
+        <button class="sbtn" onclick="savePlan()"><div class="sico">💾</div>Sauvegarder</button>
         <button class="sbtn" onclick="printPlan()"><div class="sico">🖨</div>Imprimer</button>
-        <button class="sbtn" onclick="shareNative()"><div class="sico">↗</div>Partager</button>
+        <button class="sbtn" onclick="repeatPlan()" style="grid-column:1/-1"><div class="sico">🔄</div>Prochaine sortie — adapter ce plan</button>
       </div>
     </div>`;
 
@@ -1305,7 +1306,7 @@ function s3(){
   <div class="respanel ${S.resTab==='timeline'?'active':''}">${timelinePanel}</div>
   <div class="respanel ${S.resTab==='progression'?'active':''}">${progressionPanel}</div>
   ${isRace?`<div class="respanel ${S.resTab==='race'?'active':''}">${racePanel}</div>`:''}
-  <div class="footnote">FuelForce 4.2 · Calories basées sur Ainsworth METs 2011 · Glucides selon Jeukendrup 2010<br>Base produits mise à jour ${DB_DATE} · Données indicatives · Consulte un nutritionniste du sport pour un protocole compétition</div>`;
+  <div class="footnote">FuelForce 4.3 · Calories basées sur Ainsworth METs 2011 · Glucides selon Jeukendrup 2010<br>Base produits mise à jour ${DB_DATE} · Données indicatives · Consulte un nutritionniste du sport pour un protocole compétition</div>`;
 }
 
 /* ════════════════════════════════════
@@ -1483,7 +1484,7 @@ function buildPlanText(){
   txt+=`  • Toutes les ${ZONES[S.sortie.intensite-1].l<=2?30:25}min : Gel ou boisson\n`;
   txt+=`  • -40min : Gel caféine si dispo\n`;
   txt+=`  • Arrivée : Récupération dans les 30min\n\n`;
-  txt+=`Créé avec FuelForce 4.2 — nutrition sport calibrée`;
+  txt+=`Créé avec FuelForce 4.3 — nutrition sport calibrée`;
   return txt;
 }
 
@@ -1492,11 +1493,51 @@ async function copyPlanText(){
   catch(e){alert(buildPlanText());}
 }
 
-async function shareNative(){
+function generateShareUrl(){
+  const d={
+    p:{w:S.profil.poids,s:S.profil.sport,n:S.profil.niveau,t:S.profil.tolerance},
+    o:{d:S.sortie.duree,i:S.sortie.intensite,t:S.sortie.temp,obj:S.sortie.objectif},
+    b:S.budget,
+    sl:Object.fromEntries(Object.entries(S.slots).map(([k,v])=>[k,v?v.id:null])),
+  };
+  return location.origin+location.pathname+'#plan='+btoa(JSON.stringify(d));
+}
+
+function loadFromHash(){
+  try{
+    const hash=location.hash;
+    if(!hash.startsWith('#plan='))return;
+    const d=JSON.parse(atob(hash.slice(6)));
+    if(d.p)S.profil={...S.profil,poids:d.p.w,sport:d.p.s,niveau:d.p.n,tolerance:d.p.t||'normale'};
+    if(d.o)S.sortie={...S.sortie,duree:d.o.d,intensite:d.o.i,temp:d.o.t,objectif:d.o.obj||'performance'};
+    if(d.b)S.budget=d.b;
+    if(d.sl){
+      const allProds=[...P,...S.customProds];
+      Object.entries(d.sl).forEach(([k,id])=>{S.slots[k]=id?allProds.find(p=>p.id===id)||null:null;});
+    }
+    S.step=3;S.splashDone=true;
+    history.replaceState(null,'',location.pathname);
+    showToast('📥 Plan chargé depuis le lien !');
+  }catch(e){}
+}
+
+async function sharePlanUrl(){
+  const url=generateShareUrl();
   if(navigator.share){
-    try{await navigator.share({title:'Mon plan nutrition FuelForce',text:buildPlanText()});return;}catch(e){}
+    try{await navigator.share({title:'Mon plan nutrition FuelForce',url,text:'Mon plan nutrition FuelForce :'});return;}catch(e){}
   }
-  copyPlanText();
+  try{await navigator.clipboard.writeText(url);showToast('🔗 Lien copié !');}
+  catch(e){showToast('⚠ Erreur copie');}
+}
+
+async function shareNative(){
+  sharePlanUrl();
+}
+
+function repeatPlan(){
+  S.step=2;
+  render();
+  window.scrollTo(0,0);
 }
 
 function printPlan(){
@@ -1627,6 +1668,7 @@ function launchExpress(){
   S.profil.sport=sport;S.profil.niveau=niveau;
   S.sortie.duree=duree;
   S.sortie.intensite=2;
+  S.sortie.objectif='entrainement';
   S.budget='mid';
   if(!Object.values(S.slots).some(Boolean))doApplyStack();
   const el=document.getElementById('expressOverlay');
@@ -2122,7 +2164,12 @@ function resetChecklist(){
    INIT
 ════════════════════════════════════ */
 load();
-// Accueil toujours affiché — l'utilisateur choisit de démarrer
+loadFromHash();
+// Splash masqué uniquement si plan chargé depuis URL (step=3 forcé par loadFromHash)
+if(S.splashDone&&S.step===3){
+  document.getElementById('splash').style.display='none';
+  document.getElementById('app').style.display='block';
+}
 render();
 </script>
 </body>
